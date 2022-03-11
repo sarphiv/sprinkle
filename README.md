@@ -31,17 +31,17 @@ The downloaded `sprinkle` **file** (do not delete the `sprinkle` **directory**) 
 
 # Usage
 1. On your local machine
-    a. Navigate to your project directory via the shell.
-    b. Ensure your code actually works on your own machine first.
-    c. Activate your project's conda environment with `conda activate <environment name>`.
-    d. Run one or both of the following:
+    1. Navigate to your project directory via the shell.
+    0. Ensure your code actually works on your own machine first.
+    0. Activate your project's conda environment with `conda activate <environment name>`.
+    0. Run one or both of the following:
         - `conda list -e conda-requirements.txt`
         - `python -m pipreqs --savepath pip-requirements.txt` (requires the `pipreqs` python package)
-    e. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
+    0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
 2. On DTU's HPC cluster
-    a. Navigate to your project directory via the shell.
-    b. Run `sprinkle`
-    c. Generate submission script and submit it
+    1. Navigate to your project directory via the shell.
+    0. Run `sprinkle`
+    0. Generate submission script and submit it
 
 
 # Feature list

@@ -6,11 +6,11 @@ source ${HOME}/.bashrc
 
 # If sprinkle not installed, install sprinkle and quit
 if [[ ! -d ${HOME}/sprinkle ]]; then
-    echo '================== Installing sprinkle... =================='
+    echo -e "\n================== Installing sprinkle... =================="
     git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
     git -C ${HOME}/sprinkle checkout main
 
-    echo '==================   Installed sprinkle   =================='
+    echo -e "==================   Installed sprinkle   ==================\n"
 
 
     # If sprinkle is not in PATH, make sprinkle accessible
