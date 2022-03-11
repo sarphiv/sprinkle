@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Ensure environment variables are set
-source ~/.bashrc
-
+source ${HOME}/.bashrc
 
 
 # If sprinkle not installed, install sprinkle and quit
-if [[ ! -d ~/sprinkle ]]; then
+if [[ ! -d ${HOME}/sprinkle ]]; then
     echo '================== Installing sprinkle... =================='
     git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
     git -C ${HOME}/sprinkle checkout main
@@ -16,12 +15,12 @@ if [[ ! -d ~/sprinkle ]]; then
 
     # If sprinkle is not in PATH, make sprinkle accessible
     if [[ -z ${SPRINKLE_PATH_SET+x} ]]; then
-        echo -e "\n" >> ~/.profile
-        echo -e '# If not already added, add sprinkle to path' >> ~/.profile
-        echo -e 'if [[ -d ~/sprinkle/bin && -z ${SPRINKLE_PATH_SET+x} ]]; then' >> ~/.profile
-        echo -e '    PATH="${PATH:+${PATH}:}${HOME}/sprinkle/bin"' >> ~/.profile
-        echo -e '    export SPRINKLE_PATH_SET=' >> ~/.profile
-        echo -e "fi" >> ~/.profile
+        echo -e "\n" >> ${HOME}/.profile
+        echo -e '# If not already added, add sprinkle to path' >> ${HOME}/.profile
+        echo -e 'if [[ -d ${HOME}/sprinkle/bin && -z ${SPRINKLE_PATH_SET+x} ]]; then' >> ${HOME}/.profile
+        echo -e '    PATH="${PATH:+${PATH}:}${HOME}/sprinkle/bin"' >> ${HOME}/.profile
+        echo -e '    export SPRINKLE_PATH_SET=' >> ${HOME}/.profile
+        echo -e "fi" >> ${HOME}/.profile
 
         echo 'Added sprinkle to PATH. Please run "source ~/.profile" and then run "sprinkle".'
         exit 0
@@ -35,6 +34,7 @@ fi
 SPRINKLE_DIR=${HOME}/sprinkle
 SPRINKLE_ENV=sprinkle-env
 SPRINKLE_CONDA_REQUIREMENTS=${SPRINKLE_DIR}/conda-requirements.txt
+MINICONDA_INSTALLER=${SPRINKLE_DIR}/tmp/miniconda-installer.sh
 FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
 
@@ -61,6 +61,7 @@ if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
                 touch ${FLAG_RECREATE_CONDA_ENV}
 
                 echo '==================   Updated sprinkle   =================='
+            # Else, inform of failure
             else
                 echo '==================    Update failure    =================='
             fi
@@ -87,9 +88,20 @@ fi
 if [[ ! -d "${HOME}/miniconda" ]]; then
     echo '================== Installing miniconda... =================='
 
-    chmod u+x ${SPRINKLE_DIR}/lib/install-miniconda-sh
-    source ${SPRINKLE_DIR}/lib/install-miniconda-sh
-    source ~/.bashrc
+    # Download installer
+    wget -O ${MINICONDA_INSTALLER} 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
+    # Execute installer
+    chmod u+x ${MINICONDA_INSTALLER}
+    source ${MINICONDA_INSTALLER} -f -b -p ${HOME}/miniconda
+    # Clean up installer
+    rm -f ${MINICONDA_INSTALLER}
+
+    # Integrate and setup miniconda
+    eval "$($HOME/miniconda/bin/conda shell.bash hook)"
+    source ${HOME}/.bashrc
+    conda init
+    conda config --set auto_activate_base false
+    source ${HOME}/.bashrc
 
     echo '==================   Installed miniconda   =================='
 fi
@@ -145,5 +157,6 @@ exit 0
 
 # Start sprinkle python script
 exec python -m ${SPRINKLE_DIR}/lib/main.py
+
 
 
