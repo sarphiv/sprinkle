@@ -9,7 +9,7 @@ source ~/.bashrc
 if [[ ! -d ~/sprinkle ]]; then
     echo '================== Installing sprinkle... =================='
     git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
-    git checkout main
+    git -C ${HOME}/sprinkle checkout main
 
     echo '==================   Installed sprinkle   =================='
 
@@ -39,8 +39,8 @@ FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
 
 # Check if an update is available
-git remote update >> /dev/null
-git status -uno | grep 'up to date' >> /dev/null
+git -C ${SPRINKLE_DIR} remote update >> /dev/null
+git -C ${SPRINKLE_DIR} status -uno | grep 'up to date' >> /dev/null
 UPDATE_AVAILABLE=$?
 
 # If update available
@@ -51,7 +51,7 @@ if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
             'Perform update' ) 
             echo '================== Updating sprinkle... =================='
             # Pull with fast-forward only
-            git pull --ff-only
+            git -C ${SPRINKLE_DIR} pull --ff-only
             # Mark conda sprinkle environment for recreation
             touch ${FLAG_RECREATE_CONDA_ENV}
             echo '==================   Updated sprinkle   =================='
@@ -70,11 +70,11 @@ fi
 
 
 # If miniconda not installed, install and setup
-if [[ ! -d "$HOME/miniconda" ]]; then
+if [[ ! -d "${HOME}/miniconda" ]]; then
     echo '================== Installing miniconda... =================='
 
-    chmod u+x ~/sprinkle/lib/install-miniconda-sh
-    source ~/sprinkle/lib/install-miniconda-sh
+    chmod u+x ${SPRINKLE_DIR}/lib/install-miniconda-sh
+    source ${SPRINKLE_DIR}/lib/install-miniconda-sh
     source ~/.bashrc
 
     echo '==================   Installed miniconda   =================='
@@ -130,4 +130,5 @@ exit 0
 
 
 # Start sprinkle python script
-exec python -m ~/sprinkle/main.py
+exec python -m ${SPRINKLE_DIR}/lib/main.py
+
