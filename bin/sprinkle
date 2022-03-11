@@ -39,7 +39,7 @@ FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
 
 # Check if an update is available
-git -C ${SPRINKLE_DIR} remote update >> /dev/null
+git -C ${SPRINKLE_DIR} remote update &> /dev/null
 git -C ${SPRINKLE_DIR} status -uno | grep 'up to date' >> /dev/null
 UPDATE_AVAILABLE=$?
 
