@@ -27,7 +27,7 @@ $ rm -f sprinkle
 # Update environment variables of current shell
 source ~/.profile
 # Run installed sprinkle for final setup
-sprinkle
+$ sprinkle
 ```
 
 
