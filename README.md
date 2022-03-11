@@ -9,7 +9,7 @@ On DTU's HPC cluster, simply run the following commands then follow the on-scree
 
 Copy-pasta friendly:
 ```bash
-wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle && ./sprinkle
+wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle && ./sprinkle && rm -f sprinkle
 ```
 
 Description of commands:
@@ -20,6 +20,8 @@ $ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bi
 $ chmod u+x sprinkle
 # Runs the installation script
 $ ./sprinkle
+# Delete downloaded sprinkle file
+$ rm -f sprinkle
 ```
 
 The downloaded `sprinkle` **file** (do not delete the `sprinkle` **directory**) can safely be deleted after installation.
