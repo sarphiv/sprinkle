@@ -11,6 +11,8 @@ if [[ ! -d ~/sprinkle ]]; then
     git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
     git -C ${HOME}/sprinkle checkout main
 
+    chmox u+x ${HOME}/sprinkle/bin/sprinkle
+
     echo '==================   Installed sprinkle   =================='
 
 
