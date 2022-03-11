@@ -11,8 +11,6 @@ if [[ ! -d ~/sprinkle ]]; then
     git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
     git -C ${HOME}/sprinkle checkout main
 
-    chmox u+x ${HOME}/sprinkle/bin/sprinkle
-
     echo '==================   Installed sprinkle   =================='
 
 
@@ -41,29 +39,43 @@ FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
 
 # Check if an update is available
-git -C ${SPRINKLE_DIR} remote update &> /dev/null
+git -C ${SPRINKLE_DIR} remote update >> /dev/null
 git -C ${SPRINKLE_DIR} status -uno | grep 'up to date' >> /dev/null
 UPDATE_AVAILABLE=$?
 
 # If update available
 if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
     echo 'An update is available for sprinkle.'
-    select a in "Perform update" "Skip update"; do
+    select a in 'Perform update' 'Skip update' 'Exit'; do
         case $a in
             'Perform update' ) 
             echo '================== Updating sprinkle... =================='
             # Pull with fast-forward only
             git -C ${SPRINKLE_DIR} pull --ff-only
-            # Mark conda sprinkle environment for recreation
-            touch ${FLAG_RECREATE_CONDA_ENV}
-            echo '==================   Updated sprinkle   =================='
+            
+            # Check if update succeded
+            UPDATE_SUCCESS=$?
+
+            # If succeeded, mark conda sprinkle environment for recreation
+            if [[ ${UPDATE_SUCCESS} -eq 0 ]]; then
+                touch ${FLAG_RECREATE_CONDA_ENV}
+
+                echo '==================   Updated sprinkle   =================='
+            else
+                echo '==================    Update failure    =================='
+            fi
 
             # Rerun sprinkle
+            # NOTE: Update menu is shown again if update failed.
             exec sprinkle
             ;;
 
             'Skip update' ) 
             break
+            ;;
+
+            'Exit' )
+            exit 0
             ;;
         esac
     done
@@ -133,4 +145,5 @@ exit 0
 
 # Start sprinkle python script
 exec python -m ${SPRINKLE_DIR}/lib/main.py
+
 
