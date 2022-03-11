@@ -92,7 +92,7 @@ if [[ ! -d "${HOME}/miniconda" ]]; then
     wget -O ${MINICONDA_INSTALLER} 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
     # Execute installer
     chmod u+x ${MINICONDA_INSTALLER}
-    source ${MINICONDA_INSTALLER} -f -b -p ${HOME}/miniconda
+    ${MINICONDA_INSTALLER} -f -b -p ${HOME}/miniconda
     # Clean up installer
     rm -f ${MINICONDA_INSTALLER}
 
