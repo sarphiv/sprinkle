@@ -146,18 +146,6 @@ fi
 # Activate environment for script
 conda activate ${SPRINKLE_ENV}
 
-
-
-
-conda env list
-exit 0
-
-
-
-
-# Start sprinkle python script
-exec python -m ${SPRINKLE_DIR}/lib/main.py
-
-
-
+# Start sprinkle python script and pass arguments
+exec python ${SPRINKLE_DIR}/lib/main.py "$@"
 
