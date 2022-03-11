@@ -49,7 +49,7 @@ if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
     select a in 'Perform update' 'Skip update' 'Exit'; do
         case $a in
             'Perform update' ) 
-            echo '================== Updating sprinkle... =================='
+            echo -e "\n================== Updating sprinkle... =================="
             # Pull with fast-forward only
             git -C ${SPRINKLE_DIR} pull --ff-only
             
@@ -60,10 +60,10 @@ if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
             if [[ ${UPDATE_SUCCESS} -eq 0 ]]; then
                 touch ${FLAG_RECREATE_CONDA_ENV}
 
-                echo '==================   Updated sprinkle   =================='
+                echo -e "==================   Updated sprinkle   ==================\n"
             # Else, inform of failure
             else
-                echo '==================    Update failure    =================='
+                echo -e "==================    Update failure    ==================\n"
             fi
 
             # Rerun sprinkle
@@ -86,7 +86,7 @@ fi
 
 # If miniconda not installed, install and setup
 if [[ ! -d "${HOME}/miniconda" ]]; then
-    echo '================== Installing miniconda... =================='
+    echo -e "\n================== Installing miniconda... =================="
 
     # Download installer
     wget -O ${MINICONDA_INSTALLER} 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
@@ -103,14 +103,14 @@ if [[ ! -d "${HOME}/miniconda" ]]; then
     conda config --set auto_activate_base false
     source ${HOME}/.bashrc
 
-    echo '==================   Installed miniconda   =================='
+    echo -e "==================   Installed miniconda   ==================\n"
 fi
 
 
 
 # If sprinkle environment should be recreated, delete environment
 if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
-    echo '================== Deleting sprinkle environment... =================='
+    echo -e '\n================== Deleting sprinkle environment... =================='
     # Check if sprinkle environment is active
     conda env list | grep "^${SPRINKLE_ENV}.*\*" >> /dev/null
     SPRINKLE_ENV_ACTIVE=$?
@@ -125,7 +125,7 @@ if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
 
     # Clear flag for recreation
     rm -f ${FLAG_RECREATE_CONDA_ENV} >> /dev/null
-    echo '==================   Deleted sprinkle environment   =================='
+    echo -e "==================   Deleted sprinkle environment   ==================\n"
 fi
 
 
@@ -135,10 +135,10 @@ SPRINKLE_ENV_EXISTS=$?
 
 # If sprinkle environment does not exist or if it should be recreated, create environment
 if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
-    echo '================== Creating sprinkle environment... =================='
+    echo -e "\n================== Creating sprinkle environment... =================="
     conda create -n ${SPRINKLE_ENV} --file ${SPRINKLE_CONDA_REQUIREMENTS} -y
 
-    echo '==================   Created sprinkle environment   =================='
+    echo -e "==================   Created sprinkle environment   ==================\n"
 fi
 
 
@@ -157,6 +157,7 @@ exit 0
 
 # Start sprinkle python script
 exec python -m ${SPRINKLE_DIR}/lib/main.py
+
 
 
 
