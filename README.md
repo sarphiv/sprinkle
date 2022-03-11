@@ -9,13 +9,13 @@ On DTU's HPC cluster, simply run the following commands then follow the on-scree
 
 Copy-pasta friendly:
 ```bash
-wget -O 'sprinkle' 'https://github.com/sarphiv/sprinkle/blob/main/bin/sprinkle' && chmod u+x sprinkle && ./sprinkle
+wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle && ./sprinkle
 ```
 
 Description of commands:
 ```bash
 # Downloads newest version of sprinkle
-$ wget -O 'sprinkle' 'https://github.com/sarphiv/sprinkle/blob/main/bin/sprinkle'
+$ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle'
 # Makes the script executable
 $ chmod u+x sprinkle
 # Runs the installation script
