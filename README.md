@@ -40,8 +40,8 @@ $ sprinkle
     0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
 2. **On DTU's HPC cluster**
     1. Navigate to your project directory via the shell.
-    0. Run `sprinkle`
-    0. Generate submission script and submit it
+    0. Run `sprinkle start`
+    0. Run `sprinkle help` to learn about more commands
 
 
 # Feature list
