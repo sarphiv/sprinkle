@@ -33,7 +33,7 @@ fi
 # NOTE: Defined down here because the above is hard-coded
 SPRINKLE_DIR=${HOME}/sprinkle
 SPRINKLE_ENV=sprinkle-env
-SPRINKLE_CONDA_REQUIREMENTS=${SPRINKLE_DIR}/conda-requirements.txt
+SPRINKLE_CONDA_REQUIREMENTS=${SPRINKLE_DIR}/requirements.txt
 MINICONDA_INSTALLER=${SPRINKLE_DIR}/tmp/miniconda-installer.sh
 FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 

@@ -32,15 +32,13 @@ $ sprinkle
 
 
 # Usage
-1. On your local machine
-    1. Navigate to your project directory via the shell.
-    0. Ensure your code actually works on your own machine first.
+1. **On your local machine**
+    1. Ensure your code actually works on your own machine first.
+    0. Navigate to your project directory via the shell.
     0. Activate your project's conda environment with `conda activate <environment name>`.
-    0. Run one or both of the following:
-        - `conda list -e conda-requirements.txt`
-        - `python -m pipreqs --savepath pip-requirements.txt` (requires the `pipreqs` python package)
+    0. Run `conda list -e requirements.txt`
     0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
-2. On DTU's HPC cluster
+2. **On DTU's HPC cluster**
     1. Navigate to your project directory via the shell.
     0. Run `sprinkle`
     0. Generate submission script and submit it
@@ -51,5 +49,6 @@ $ sprinkle
 - Miniconda installation
 - Submission script generation
 - Job submission
+- Automatic job conda environment setup
 - Monitoring of recent output, errors, and program output
 - Killing of newest job
