@@ -15,12 +15,14 @@ libuuid=1.0.3=h7f8727e_2
 ncurses=6.3=h7f8727e_2
 openssl=1.1.1m=h7f8727e_0
 pip=21.2.4=py310h06a4308_0
+prompt-toolkit=3.0.28=pypi_0
 python=3.10.0=h12debd9_5
 readline=8.1.2=h7f8727e_1
 setuptools=58.0.4=py310h06a4308_0
 sqlite=3.38.0=hc218d9a_0
 tk=8.6.11=h1ccaba5_0
 tzdata=2021e=hda174b7_0
+wcwidth=0.2.5=pypi_0
 wheel=0.37.1=pyhd3eb1b0_0
 xz=5.2.5=h7b6447c_0
 zlib=1.2.11=h7f8727e_4
