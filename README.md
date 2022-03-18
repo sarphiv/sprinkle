@@ -39,9 +39,8 @@ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/
     0. In your project directory, export your packages with `conda list -e > requirements.txt`.
     0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
 2. **On DTU's HPC cluster**
-    1. Navigate to your project directory via the shell.
-    0. Run `sprinkle start` and follow instructions.
-    0. Run `sprinkle help` to learn about more commands.
+    1. Run `sprinkle start` in your project directory.
+    0. Run `sprinkle help` to view other commands.
 
 
 # Feature list
