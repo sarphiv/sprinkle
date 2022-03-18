@@ -7,28 +7,30 @@ Automatically sets up miniconda, generates submission scripts with conda integra
 
 
 # Installation
-On DTU's HPC cluster, simply run the following commands then follow the on-screen instructions.
+On DTU's HPC cluster, simply run the following commands.
 
-Copy-pasta friendly:
 ```bash
 wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle && ./sprinkle && rm -f sprinkle && source ~/.profile && sprinkle
 ```
 
-Description of commands:
-```bash
-# Downloads newest version of sprinkle
-$ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle'
-# Makes the script executable
-$ chmod u+x sprinkle
-# Runs the installation script
-$ ./sprinkle
-# Delete downloaded sprinkle file
-$ rm -f sprinkle
-# Update environment variables of current shell
-source ~/.profile
-# Run installed sprinkle for final setup
-$ sprinkle
-```
+<details>
+  <summary>Description of the above commands</summary>
+
+  ```bash
+  # Downloads newest version of sprinkle
+  $ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle'
+  # Makes the script executable
+  $ chmod u+x sprinkle
+  # Runs the installation script
+  $ ./sprinkle
+  # Delete downloaded sprinkle file
+  $ rm -f sprinkle
+  # Update environment variables of current shell
+  $ source ~/.profile
+  # Run installed sprinkle for final setup
+  $ sprinkle
+  ```
+</details>
 
 
 # Usage

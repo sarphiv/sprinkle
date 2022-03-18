@@ -53,7 +53,8 @@ class Command:
     def status() -> bool:
         # TODO: Output status overview of job details
         pass
-        
+
+
     def settings() -> bool:
         # Load settings
         settings = load_settings() or JobSettings()
@@ -110,6 +111,8 @@ class Command:
         print("Not yet implemented.")
         
         return False
+
+
 
 
 def main(args: list[str]):
