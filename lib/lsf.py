@@ -1,3 +1,6 @@
+from distutils.log import ERROR
+from enum import Enum
+from typing import Optional
 from dataclasses import dataclass
 from itertools import islice
 import pickle
@@ -5,32 +8,32 @@ import os
 import subprocess
 import re
 
-from prompt import prompt_integer, prompt_string, prompt_list
-from main import sprinkle_project_options, sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir
+from main import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir
 
 
 @dataclass(frozen=True)
-class JobOptions:
-    name: str
-        
-    env_name: str
-    env_on_done_delete: bool
-    script_target: str
+class JobSettings:
+    name: str                   = "default-job-name"
+    env_name: str               = "default-env-name"
+    env_on_done_delete: bool    = True
+    script_target: str          = "main.py"
 
-    time_max: str
-    queue: str
-    is_gpu_queue: bool
+    time_max: str               = "24:00"
+    queue: str                  = "hpc"
+    is_gpu_queue: bool          = False
     
-    cpu_cores: int
-    cpu_memory_per_core: str
-    cpu_memory_max: str
+    cpu_cores: int              = 16
+    cpu_memory_per_core_mb: int = 512
+    cpu_memory_max_gb: int      = 6
     
-    email: str
+    email: str                  = ""
+    
+    version: str                = "1"
 
 
 @dataclass(frozen=True)
 class JobDetails:
-    short_name: str
+    name_short: str
         
     job_id: str
     queue: str
@@ -40,20 +43,26 @@ class JobDetails:
 
 
 
-def save_options(options: JobOptions, path: str) -> None:
-    pass
+
+def save_settings(settings: JobSettings) -> None:
+    if not os.path.isdir(sprinkle_project_dir):
+        os.makedirs(sprinkle_project_dir)
+
+    with open(f"{sprinkle_project_dir}/{sprinkle_project_settings_file}", "wb") as file:
+        settings = pickle.dump(settings, file)
 
 
-def load_options(path: str) -> JobOptions:
-    pass
+def load_settings() -> Optional[JobSettings]:
+    #TODO: Make sure file actually exists
+    with open(f"{sprinkle_project_dir}/{sprinkle_project_settings_file}", "rb") as file:
+        settings = pickle.load(file)
+
+    return settings if JobSettings.version == settings.version else None
 
 
-def prompt_options() -> JobOptions:
-    pass
-    # TODO: No spaces in job name nor env name
 
 
-def submit_options(options: JobOptions) -> str:
+def submit_job(settings: JobSettings) -> str:
     # If sprinkle directories do not exist for project, create them
     for dir in [sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir]:
         if not os.path.isdir(dir):
@@ -63,7 +72,7 @@ def submit_options(options: JobOptions) -> str:
     submission = subprocess.run(
         ["bsub"], 
         stdout=subprocess.PIPE, 
-        input=generate_bsub_script(options),
+        input=generate_bsub_script(settings),
         encoding="ascii"
     )
     
@@ -75,6 +84,14 @@ def submit_options(options: JobOptions) -> str:
     return job_id
 
 
+def kill_jobs(*job_ids: list[str]) -> tuple[list[str], list[str]]:
+    pass
+    #TODO: Return jobs that were killed and not killed
+
+
+def view_job(details: JobDetails, directory: str) -> bool:
+    # TODO: Implement viewing of job outputs
+    pass
 
 
 def get_active_jobs() -> dict[str, JobDetails]:
@@ -101,7 +118,7 @@ def get_active_jobs() -> dict[str, JobDetails]:
             
             # Instantiate job details object
             job_details[details[0]] = JobDetails(
-                short_name=details[3],
+                name_short=details[3],
                 job_id=details[0],
                 queue=details[2],
                 status=details[5],
@@ -114,40 +131,30 @@ def get_active_jobs() -> dict[str, JobDetails]:
         return job_details
 
 
-def prompt_active_jobs() -> str:
-    # Get active job details
-    job_details = get_active_jobs()
-    # Prompt user for an active job
-    job_id = prompt_list(job_details)
-    
-    # Return chosen job ID
-    return job_id
 
 
-
-
-def generate_bsub_script(options: JobOptions): 
+def generate_bsub_script(settings: JobSettings) -> str: 
     def conditional_string(condition, string, end="\n"):
         return string if condition + end else ""
 
     return (f"""
 #!/bin/bash
 ### Job name
-#BSUB -J {options.name}
+#BSUB -J {settings.name}
 
 
 ### Job queue
-#BSUB -q {options.queue} 
+#BSUB -q {settings.queue} 
 """
 +
-conditional_string(options.is_gpu_queue,
+conditional_string(settings.is_gpu_queue,
 f'''
 ### GPUs to request and if to reserve it exclusively\n"
 #BSUB -gpu "num=1:mode=exclusive_process"''')
 +
 f"""
 ### Cores to request
-#BSUB -n {options.cpu_cores}
+#BSUB -n {settings.cpu_cores}
 
 ### Force cores to be on same host
 #BSUB -R "span[hosts=1]" 
@@ -157,26 +164,26 @@ export OMP_NUM_THREADS=$LSB_DJOB_NUMPROC
 
 
 ### Amount of memory per core
-#BSUB -R "rusage[mem={options.cpu_memory_per_core}]" 
+#BSUB -R "rusage[mem={settings.cpu_memory_per_core_mb}MB]" 
 
 ### Maximum amount of memory before killing task
-#BSUB -M {options.cpu_memory_max} 
+#BSUB -M {settings.cpu_memory_max_gb}GB
 
 
 ### Wall time (HH:MM), how long before killing task
-#BSUB -W {options.time_max}
+#BSUB -W {settings.time_max}
 
 
 ### Output and error file. %J is the job-id -- 
 ### -o and -e mean append, -oo and -eo mean overwrite -- 
-#BSUB -oo {sprinkle_project_output_dir}/%J.txt
-#BSUB -eo {sprinkle_project_error_dir}/%J.txt
+#BSUB -oo {sprinkle_project_output_dir}/%J-{settings.name}.txt
+#BSUB -eo {sprinkle_project_error_dir}/%J-{settings.name}.txt
 """
 +
-conditional_string(options.email, 
+conditional_string(settings.email, 
 f"""
 ### Email to receive notifications
-#BSUB -u {options.email}
+#BSUB -u {settings.email}
 
 ### Notify via email at start
 #BSUB -B
@@ -190,20 +197,20 @@ f"""
 source ~/.bashrc
 
 # Check if job environment exists
-conda env list | grep "^${options.env_name}" >> /dev/null
+conda env list | grep "^${settings.env_name}" >> /dev/null
 SPRINKLE_JOB_ENV_EXISTS=$?
 
 # If environment does not exist, create environment
 if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
     # Create environment
-    conda create -n {options.env_name} --file requirements.txt -y
+    conda create -n {settings.env_name} --file requirements.txt -y
     
     # Activate environment for script
-    conda activate {options.env_name}
+    conda activate {settings.env_name}
 # Else, attempt installing packages in case there were changes
 else
     # Activate environment for script
-    conda activate {options.env_name}
+    conda activate {settings.env_name}
 
     # Attempt installing (new) packages 
     conda install --file requirements.txt -y
@@ -211,13 +218,13 @@ fi
 
 
 # Run job script and save output to file
-python {options.script_target} > {sprinkle_project_script_dir}/$J.txt
+python {settings.script_target} > {sprinkle_project_script_dir}/%J-{settings.name}.txt
 
 """
 +
-conditional_string(options.env_on_done_delete, 
+conditional_string(settings.env_on_done_delete, 
 f"""
 ### Remove environment when done
-conda env remove -n {options.env_name} -y
+conda env remove -n {settings.env_name} -y
 """)
 )
