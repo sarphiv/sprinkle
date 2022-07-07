@@ -1,18 +1,27 @@
+"""
+Sprinkle
+
+Usage:
+  sprinkle start [<args>...]
+  sprinkle stop [<job_id>... | -a | --all]
+  sprinkle status
+  sprinkle settings
+  sprinkle export [path]
+  sprinkle [-h | -? | --help]
+
+Options:
+  -h -? --help       Show this screen.
+  -a --all           Kill all jobs
+"""
+
+from docpie import docpie
 import sys
 import inspect
 
-from lib.lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job
-from lib.lsf_prompt import prompt_settings
+from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job
+from lsf_prompt import prompt_settings
 
 
-
-
-sprinkle_project_dir = ".sprinkle"
-sprinkle_project_settings_file = "settings.pkl"
-sprinkle_project_settings_export_file = "sprinkle-job-export.sh"
-sprinkle_project_script_dir = sprinkle_project_dir + "/script"
-sprinkle_project_output_dir = sprinkle_project_dir + "/output"
-sprinkle_project_error_dir = sprinkle_project_dir + "/error"
 
 
 
@@ -115,6 +124,11 @@ class Command:
 
 
 
+prompt_settings(JobSettings())
+
+
+docpie(__doc__, attachvalue=False, optionsfirst=True, appearedonly=True, )
+
 def main(args: list[str]):
     methods = inspect.getmembers(Command, predicate=inspect.isroutine)
     methods = {name: method for name, method in methods if not name.startswith('_')}
@@ -153,13 +167,14 @@ if __name__ == "__main__":
 
 
 #TODO: Ok, maybe MVP first instead...
-#TODO: Disclaimer on first run
 #TODO: file for default bsub options, and base recommendations off of these
 #TODO: Save bsub options in file and output status whether this file exists for the project yet (in current working directory)
 #TODO: When trying to edit options again, display current settings instead of default recommendations
-#TODO: running submit, just submits based off of the options
+#TODO: running start, just submits based off of the options
+#TODO: Options selection screen with overview, select option to open prompt
+#TODO: Allow users to also input arguments for their script target
 #TODO: Ability to use sprinkle by e.g. 
-#  sprinkle start (if no options for project, prompt user for first time project setup)
+#  sprinkle start [args...] (if no options for project, prompt user for first time project setup)
 #  sprinkle stop [(job id [job_id ...]) | --all] (if none provided, prompt user, add option to kill all)
 #  sprinkle status
 #  sprinkle settings
@@ -167,6 +182,11 @@ if __name__ == "__main__":
 #  sprinkle [help]
 
 #  sprinkle view [job id --(output | error | script)] (if none, prompt user)
+
+#TODO: Use environment.yaml instead for both sprinkle and jobs
+#TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
+#TODO: Ability to add time to jobs
+#TODO: Disclaimer on first run
 
 #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
 #TODO: Check if sprinkle project output directories exist before monitoring

@@ -8,27 +8,30 @@ import os
 import subprocess
 import re
 
-from main import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir
+from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir
 
 
 @dataclass(frozen=True)
 class JobSettings:
-    name: str                   = "default-job-name"
-    env_name: str               = "default-env-name"
-    env_on_done_delete: bool    = True
-    script_target: str          = "main.py"
+    name: str                           = "default-job-name"
+    env_name: str                       = "default-env-name"
+    env_on_done_delete: bool            = True
 
-    time_max: str               = "24:00"
-    queue: str                  = "hpc"
-    is_gpu_queue: bool          = False
+    working_dir: Optional[str]          = None
+    env_spec: str                       = "environment.yml"
+    script_target: str                  = "main.py"
+
+    time_max: str                       = "24:00"
+    queue: str                          = "hpc"
+    is_gpu_queue: bool                  = False
     
-    cpu_cores: int              = 16
-    cpu_memory_per_core_mb: int = 512
-    cpu_memory_max_gb: int      = 6
+    cpu_cores: int                      = 16
+    cpu_mem_per_core_mb: int            = 512
+    cpu_mem_max_gb: int                 = 6
     
-    email: str                  = ""
+    email: str                          = ""
     
-    version: str                = "1"
+    version: str                        = "1"
 
 
 @dataclass(frozen=True)
@@ -38,6 +41,8 @@ class JobDetails:
     job_id: str
     queue: str
     status: str
+    cpu_usage: Optional[str]
+    mem_usage: Optional[str]
     time_start: str
     time_elapsed: str
 
@@ -135,7 +140,7 @@ def get_active_jobs() -> dict[str, JobDetails]:
 
 def generate_bsub_script(settings: JobSettings) -> str: 
     def conditional_string(condition, string, end="\n"):
-        return string if condition + end else ""
+        return string + end if condition else ""
 
     return (f"""
 #!/bin/bash
@@ -164,10 +169,10 @@ export OMP_NUM_THREADS=$LSB_DJOB_NUMPROC
 
 
 ### Amount of memory per core
-#BSUB -R "rusage[mem={settings.cpu_memory_per_core_mb}MB]" 
+#BSUB -R "rusage[mem={settings.cpu_mem_per_core_mb}MB]" 
 
 ### Maximum amount of memory before killing task
-#BSUB -M {settings.cpu_memory_max_gb}GB
+#BSUB -M {settings.cpu_mem_max_gb}GB
 
 
 ### Wall time (HH:MM), how long before killing task
@@ -195,7 +200,16 @@ f"""
 
 # Get shell environment
 source ~/.bashrc
+"""
++
+conditional_string(settings.working_dir is not None,
+f"""
+# Change working directory
+cd {settings.working_dir}
 
+""")
++
+f"""
 # Check if job environment exists
 conda env list | grep "^${settings.env_name}" >> /dev/null
 SPRINKLE_JOB_ENV_EXISTS=$?
@@ -203,17 +217,17 @@ SPRINKLE_JOB_ENV_EXISTS=$?
 # If environment does not exist, create environment
 if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
     # Create environment
-    conda create -n {settings.env_name} --file requirements.txt -y
+    conda create -n {settings.env_name} --file {settings.env_spec} -y
     
     # Activate environment for script
     conda activate {settings.env_name}
-# Else, attempt installing packages in case there were changes
+# Else, environment exists, attempt installing packages in case there were changes
 else
+    # Attempt installing (new) packages 
+    conda env update -n {settings.env_name} --file {settings.env_spec} --prune -y
+
     # Activate environment for script
     conda activate {settings.env_name}
-
-    # Attempt installing (new) packages 
-    conda install --file requirements.txt -y
 fi
 
 

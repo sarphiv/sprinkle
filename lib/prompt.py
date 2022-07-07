@@ -9,8 +9,11 @@ def prompt_base(info_text: str, value_validator: Validator = None, value_suggest
 
     Args:
         info_text (str): String describing prompt
-        value_validator (Validator, optional): Validator instance to validate input. Defaults to None.
-        value_suggestion (str, optional): Initial input suggestion for user. Default response is this. Defaults to "".
+        value_validator (Validator, optional): A function that takes a string 
+            and returns a boolean. If the function returns True, the input is accepted. 
+            If the function returns False, the input is rejected
+        value_suggestion (str, optional): Initial input suggestion for user. 
+            Default response is this. Defaults to "".
         value_suggestions (list[str], optional): Input suggestions that can be autocompleted. Defaults to None.
 
     Returns:
@@ -37,7 +40,8 @@ def prompt_base(info_text: str, value_validator: Validator = None, value_suggest
 
     
     # Create prompt string
-    prompt_text = f"{info_text}\n{f'Suggested values: [{value_suggestions}]\n' if value_suggestions else ''}>>> "
+    n = '\n'
+    prompt_text = f"{info_text}{n}{f'Suggested values: [{value_suggestions_text}]{n}' if value_suggestions else ''}>>> "
 
 
     # Prompt user
@@ -72,7 +76,7 @@ def prompt_integer(info_text: str, min: int, max: int, value_suggestion: int, va
         value_suggestions
     ))
 
-def prompt_string(info_text: str, value_allowed: Optional[list[str]], value_suggestion: str, value_suggestions: list[str] = None) -> str:
+def prompt_string(info_text: str, value_allowed: Optional[list[str]], value_suggestion: str = "", value_suggestions: list[str] = None) -> str:
     return prompt_base(
         info_text,
         Validator.from_callable(lambda s: s in value_allowed if value_allowed else True),
