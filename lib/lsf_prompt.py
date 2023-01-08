@@ -1,5 +1,5 @@
 from varname import nameof
-from typing import Callable, Any
+from typing import Callable, Optional, Any
 from os import getcwd
 from tabulate import tabulate
 
@@ -30,8 +30,8 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = {
         ("Working directory", empty_coalesce(getcwd())),
     f"{nameof(JobSettings.env_spec)}": 
         ("Environment file", as_is),
-    f"{nameof(JobSettings.script_target)}": 
-        ("Python script", as_is),
+    f"{nameof(JobSettings.script)}": 
+        ("Script (or command)", as_is),
 
     f"{nameof(JobSettings.time_max)}": 
         ("Job max time (HH:mm)", as_is),
@@ -88,10 +88,17 @@ def prompt_settings(suggested_settings: JobSettings) -> JobSettings:
     # TODO: No spaces in job name nor env name
     
     
-def prompt_active_jobs() -> str:
+def prompt_active_jobs() -> Optional[str]:
     # Get active job details
     job_details = get_active_jobs()
+    
+    # If no active jobs, return None
+    if len(job_details) == 0:
+        return None
+
+
     # Prompt user for an active job
+    # TODO: Finish prompting for job
     job_id = prompt_list(job_details)
     
     # Return chosen job ID

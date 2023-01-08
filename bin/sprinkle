@@ -33,7 +33,7 @@ fi
 # NOTE: Defined down here because the above is hard-coded
 SPRINKLE_DIR=${HOME}/sprinkle
 SPRINKLE_ENV=sprinkle-env
-SPRINKLE_CONDA_REQUIREMENTS=${SPRINKLE_DIR}/requirements.txt
+SPRINKLE_CONDA_PACKAGES=${SPRINKLE_DIR}/environment.yml
 MINICONDA_INSTALLER=${SPRINKLE_DIR}/tmp/miniconda-installer.sh
 FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
@@ -136,7 +136,7 @@ SPRINKLE_ENV_EXISTS=$?
 # If sprinkle environment does not exist or if it should be recreated, create environment
 if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
     echo -e "\n================== Creating sprinkle environment... =================="
-    conda create -n ${SPRINKLE_ENV} --file ${SPRINKLE_CONDA_REQUIREMENTS} -y
+    conda create -n ${SPRINKLE_ENV} --file ${SPRINKLE_CONDA_PACKAGES} -y
 
     echo -e "==================   Created sprinkle environment   ==================\n"
 fi

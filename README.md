@@ -36,7 +36,7 @@ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/
 # Usage
 1. **On your local machine**
     1. Activate your project's environment with `conda activate <environment name>`.
-    0. In your project directory, export your packages with `conda list -e > requirements.txt`.
+    0. In your project directory, export your packages with `conda env export > environment.yml`.
     0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
 2. **On DTU's HPC cluster**
     1. Run `sprinkle start` in your project directory.

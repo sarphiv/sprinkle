@@ -1,4 +1,3 @@
-from distutils.log import ERROR
 from enum import Enum
 from typing import Optional
 from dataclasses import dataclass
@@ -8,7 +7,7 @@ import os
 import subprocess
 import re
 
-from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir
+from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir
 
 
 @dataclass(frozen=True)
@@ -19,7 +18,7 @@ class JobSettings:
 
     working_dir: Optional[str]          = None
     env_spec: str                       = "environment.yml"
-    script_target: str                  = "main.py"
+    script: str                         = "python main.py"
 
     time_max: str                       = "24:00"
     queue: str                          = "hpc"
@@ -31,7 +30,7 @@ class JobSettings:
     
     email: str                          = ""
     
-    version: str                        = "1"
+    version: str                        = "1.0.0"
 
 
 @dataclass(frozen=True)
@@ -69,7 +68,7 @@ def load_settings() -> Optional[JobSettings]:
 
 def submit_job(settings: JobSettings) -> str:
     # If sprinkle directories do not exist for project, create them
-    for dir in [sprinkle_project_output_dir, sprinkle_project_error_dir, sprinkle_project_script_dir]:
+    for dir in [sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir]:
         if not os.path.isdir(dir):
             os.makedirs(dir)
     
@@ -181,7 +180,7 @@ export OMP_NUM_THREADS=$LSB_DJOB_NUMPROC
 
 ### Output and error file. %J is the job-id -- 
 ### -o and -e mean append, -oo and -eo mean overwrite -- 
-#BSUB -oo {sprinkle_project_output_dir}/%J-{settings.name}.txt
+#BSUB -oo {sprinkle_project_log_dir}/%J-{settings.name}.txt
 #BSUB -eo {sprinkle_project_error_dir}/%J-{settings.name}.txt
 """
 +
@@ -232,7 +231,7 @@ fi
 
 
 # Run job script and save output to file
-python {settings.script_target} > {sprinkle_project_script_dir}/%J-{settings.name}.txt
+{settings.script} > {sprinkle_project_output_dir}/%J-{settings.name}.txt
 
 """
 +

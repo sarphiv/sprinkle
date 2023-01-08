@@ -1,22 +1,32 @@
 """
-Sprinkle
+Sprinkle streamlines management of LSF jobs.
+
+Project repository: https://github.com/sarphiv/sprinkle
+
 
 Usage:
-  sprinkle start [<args>...]
-  sprinkle stop [<job_id>... | -a | --all]
-  sprinkle status
-  sprinkle settings
-  sprinkle export [path]
-  sprinkle [-h | -? | --help]
+  sprinkle start [--] [<args>...]                           Submit the job script and pass <args> to job script.
+                                                            If <args> contains dashes, 
+                                                            add the two dashes "--" before <args>.
+  sprinkle stop [<job_id>... | -a | --all]                  Stop specific jobs or all jobs.
+                                                            If nothing specified, prompt to select job to kill.
+  sprinkle view [((--output | --log | --error) <job_id>)]   View output, log, or errors of a specific job.
+  sprinkle status                                           See overview of job details.
+  sprinkle settings                                         Set up or change existing job settings.
+  sprinkle export [path]                                    Export submission script to path. 
+                                                            Defaults to working directory.
+  sprinkle [help | -h | -? | --help]                        Show this screen.
 
 Options:
   -h -? --help       Show this screen.
   -a --all           Kill all jobs
 """
 
-from docpie import docpie
 import sys
 import inspect
+from typing import Optional
+
+from docpie import docpie
 
 from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job
 from lsf_prompt import prompt_settings
@@ -26,7 +36,7 @@ from lsf_prompt import prompt_settings
 
 
 class Command:
-    def start() -> bool:
+    def start(arguments: Optional[str]) -> bool:
         # Load settings
         settings = load_settings()
         # If no settings loaded, create and save settings
@@ -38,7 +48,7 @@ class Command:
         job_id = submit_job(settings)
 
         # Print job ID
-        print(f'Started job (Name: "{settings.name}", ID: "{job_id}")')
+        print(f'Started job (Name: "{settings.name}", ID: "{job_id}", Command: "{settings.script} {arguments}")')
 
 
         # Return successful
@@ -56,8 +66,10 @@ class Command:
         else:
             # TODO: Kill selected
             killed_job_ids, not_killed_job_ids = kill_jobs(*args)
-            
-            
+        
+    def view(args) -> bool:
+        # TODO: Not implemented
+        pass
             
     def status() -> bool:
         # TODO: Output status overview of job details
@@ -108,26 +120,15 @@ class Command:
         # Return successful
         return True
 
+
+
+try:
     
-    def help() -> bool:
-        # TODO: Write help text
+    prompt_settings(JobSettings())
 
-        # Return successful
-        return True
-    
-    
-    def view(args) -> bool:
-        print("Not yet implemented.")
-        
-        return False
-
-
-
-
-prompt_settings(JobSettings())
-
-
-docpie(__doc__, attachvalue=False, optionsfirst=True, appearedonly=True, )
+    docpie(__doc__, attachvalue=False, appearedonly=True)
+except KeyboardInterrupt:
+    exit(-1)
 
 def main(args: list[str]):
     methods = inspect.getmembers(Command, predicate=inspect.isroutine)
@@ -172,20 +173,19 @@ if __name__ == "__main__":
 #TODO: When trying to edit options again, display current settings instead of default recommendations
 #TODO: running start, just submits based off of the options
 #TODO: Options selection screen with overview, select option to open prompt
-#TODO: Allow users to also input arguments for their script target
-#TODO: Ability to use sprinkle by e.g. 
-#  sprinkle start [args...] (if no options for project, prompt user for first time project setup)
-#  sprinkle stop [(job id [job_id ...]) | --all] (if none provided, prompt user, add option to kill all)
-#  sprinkle status
-#  sprinkle settings
-#  sprinkle export [path]
-#  sprinkle [help]
+    #TODO: Allow users to also input arguments for their script target
+    #TODO: Ability to use sprinkle by e.g. 
+    #  sprinkle start [args...] (if no options for project, prompt user for first time project setup)
+    #  sprinkle stop [(job id [job_id ...]) | --all] (if none provided, prompt user, add option to kill all)
+    #  sprinkle status
+    #  sprinkle settings
+    #  sprinkle export [path]
+    #  sprinkle [help]
 
-#  sprinkle view [job id --(output | error | script)] (if none, prompt user)
+    #  sprinkle view [job id --(log | error | output)] (if none, prompt user)
 
-#TODO: Use environment.yaml instead for both sprinkle and jobs
+    #TODO: Use environment.yaml instead for both sprinkle and jobs
 #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
-#TODO: Ability to add time to jobs
 #TODO: Disclaimer on first run
 
 #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
