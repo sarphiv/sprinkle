@@ -1,10 +1,10 @@
 import os
+from typing import Optional, Union, Literal, Pattern
 
 from prompt_toolkit import prompt
-from prompt_toolkit.completion import Completer, FuzzyWordCompleter, PathCompleter
+from prompt_toolkit.completion import Completer, FuzzyWordCompleter, PathCompleter, FuzzyCompleter
 from prompt_toolkit.validation import Validator, ThreadedValidator
-from typing import Optional, Union
-
+from tabulate import tabulate
 
 def prompt_base(info_text: str, value_validator: Validator = None, value_suggestion: str = "", value_suggestions: Union[list[str], Completer] = None) -> str:
     """Base prompt method for prompting user for input
@@ -21,37 +21,43 @@ def prompt_base(info_text: str, value_validator: Validator = None, value_suggest
     Returns:
         str: User input that passes the validator
     """
-    # Cut off printed suggestions if they are too long
-    value_suggestions_length = 0
-    value_suggestions_length_max = 20
-    value_suggestions_text = ""
-    for value in value_suggestions:
-        if value_suggestions_length + len(value) > value_suggestions_length_max:
-            value_suggestions_text = f"{value_suggestions_text}, ..."
-            break
+    # Do validation on another thread
+    value_validator = ThreadedValidator(value_validator)
 
-        if value_suggestions_text == "":
-            value_suggestions_text = f'"{value}"'
-        else:
-            value_suggestions_text = f'{value_suggestions_text}, "{value}"'
 
-        value_suggestions_length += len(value)
+    # If word suggestions provided, initialize suggestions and fuzzy completer
+    if isinstance(value_suggestions, list):    
+        # Cut off printed suggestions if they are too long
+        value_suggestions_length = 0
+        value_suggestions_length_max = os.get_terminal_size().columns // 2
+        value_suggestions_text = ""
+        for value in value_suggestions:
+            if value_suggestions_length + len(value) > value_suggestions_length_max:
+                value_suggestions_text = f"{value_suggestions_text}, ..."
+                break
+
+            if value_suggestions_text == "":
+                value_suggestions_text = f'"{value}"'
+            else:
+                value_suggestions_text = f'{value_suggestions_text}, "{value}"'
+
+            value_suggestions_length += len(value)
+
+
+        # Create fuzzy completer
+        completer = FuzzyWordCompleter(value_suggestions)
+    # Else, assign completer (or None)
+    else:
+        completer = value_suggestions
 
 
     # Create prompt string
     n = '\n'
-    prompt_text = f"{info_text}{n}{f'Suggested values: [{value_suggestions_text}]{n}' if value_suggestions else ''}>>> "
-
-
-    # If word suggestions provided, initialize fuzzy completer
-    if value_suggestions and isinstance(value_suggestions, list):
-        completer = FuzzyWordCompleter(value_suggestions)
-
-    # NOTE: Completer is now either None or a completer
+    prompt_text = f"{info_text}{n}{f'Suggested values: [{value_suggestions_text}]{n}' if isinstance(value_suggestions, list) else ''}>>> "
 
 
     # Prompt user
-    answer = prompt(
+    response = prompt(
         prompt_text,
         placeholder=value_suggestion,
         reserve_space_for_menu=0,
@@ -59,16 +65,61 @@ def prompt_base(info_text: str, value_validator: Validator = None, value_suggest
         complete_while_typing=True, 
         complete_in_thread=True,
         validator=value_validator, 
-        validate_while_typing=True, 
+        validate_while_typing=True,
         mouse_support=True,
     )
     
 
     # Return default answer, if no answer, else return answer
-    return value_suggestion if answer == '' else answer
+    return value_suggestion if response == '' else response
 
 
-def prompt_integer(info_text: str, min: int, max: int, value_suggestion: int, value_suggestions: list[int] = None) -> int:
+
+def prompt_string(
+    info_text: str, 
+    value_allowed: list[str] = None, 
+    value_disallowed: list[str] = None, 
+    str_disallowed: list[str] = None, 
+    value_suggestion: str = "", 
+    value_suggestions: Union[list[str], Completer] = None
+) -> str:
+    def check_input(s: str):
+        if value_allowed and s not in value_allowed:
+            return False
+        
+        if value_disallowed and s in value_disallowed:
+            return False
+        
+        if str_disallowed and any([disallowed in s for disallowed in str_disallowed]):
+            return False
+
+        return True
+
+
+    return prompt_base(
+        info_text,
+        Validator.from_callable(check_input),
+        value_suggestion,
+        value_suggestions
+    )
+
+
+def prompt_regex(info_text: str, value_regex: Pattern, value_suggestion: str = "", value_suggestions: Union[list[str], Completer] = None) -> bool:
+    return prompt_base(
+        info_text, 
+        Validator.from_callable(lambda s: value_regex.search(s) is not None),
+        value_suggestion,
+        value_suggestions
+    )
+
+
+def prompt_range_integer(
+    info_text: str, 
+    value_min: Union[int, float], 
+    value_max: Union[int, float], 
+    value_suggestion: int = None, 
+    value_suggestions: list[Union[int, str]] = None
+) -> int:
     def check_int(s: str):
         if len(s) and s[0] in ('-', '+'):
             return s[1:].isdigit()
@@ -78,18 +129,107 @@ def prompt_integer(info_text: str, min: int, max: int, value_suggestion: int, va
 
     return int(prompt_base(
         info_text,
-        Validator.from_callable(lambda s: check_int(s) and min <= int(s) < max),
-        value_suggestion,
-        value_suggestions
+        Validator.from_callable(lambda s: check_int(s) and value_min <= int(s) < value_max),
+        str(value_suggestion) if value_suggestion else value_suggestion,
+        [str(val) for val in value_suggestions] if value_suggestions else value_suggestion
     ))
 
-def prompt_string(info_text: str, value_allowed: Optional[list[str]], value_suggestion: str = "", value_suggestions: list[str] = None) -> str:
+
+def prompt_boolean(
+    info_text: str, 
+    value_true: list[str] = ["y", "yes", "true", "1"], 
+    value_false: list[str] = ["n", "no", "false", "0"], 
+    value_suggestion: str = ""
+) -> bool:
+    response = prompt_string(
+        info_text, 
+        value_true + value_false,
+        value_suggestion,
+        # Weave elements together [a, 1, b, 2] with length shortest list
+        [elem for pair in zip(value_true, value_false) for elem in pair]
+    )
+
+    return response in value_true
+
+
+def prompt_path(
+    info_text: str,
+    path_type: Literal["file", "directory"] = "file",
+    value_suggestion: str = None, 
+) -> str:
     return prompt_base(
         info_text,
-        Validator.from_callable(lambda s: s in value_allowed if value_allowed else True),
+        Validator.from_callable(os.path.isfile if path_type == "file" else os.path.isdir),
         value_suggestion,
-        value_suggestions
+        FuzzyCompleter(PathCompleter(only_directories=path_type == "directory", expanduser=True), )
+    )
+
+def prompt_choice(
+    info_text: str, 
+    choices: Union[list[str], list[list[str]], list[list[list[str]]]],
+    index: Union[list[str], list[list[str]]] = None,
+    headers: list[str] = None,
+    value_suggestion: str = ""
+) -> str:
+    # Normalize choice to triple nested list form
+    if isinstance(choices[0], str):
+        choices = [[[choice] for choice in choices]]
+    elif isinstance(choices[0][0], str):
+        choices = [[[choice] for choice in choice_group] for choice_group in choices]
+
+    # Normalize index to double nested list form
+    if not index:
+        index = []
+        i = 0
+
+        for choice_group in choices:
+            index.append([str(i) for i in range(i, i + len(choice_group))])
+            i += len(choice_group)
+
+    elif isinstance(index[0], str):
+        index = [index]
+
+
+    if headers is None:
+        headers = []
+
+
+    choices_inner_len = len(choices[0][0])
+    index_width_max = max(len(idx) for index_group in index for idx in index_group)
+
+    choices_table = []
+    index_table = []
+    choices_values = []
+    index_values = []
+    for choice_group, index_group in zip(choices, index):
+        choices_table.extend(choice_group)
+        index_table.extend(index_group)
+        choices_values.extend([choice[0] for choice in choice_group])
+        index_values.extend(index_group)
+
+        choices_table.append([''] * choices_inner_len)
+        index_table.append('-' * index_width_max)
+
+    
+    # Pop last redundant row
+    choices_table.pop()
+    index_table.pop()
+
+
+    prompt_text = f"{tabulate(choices_table, headers=headers, showindex=index_table)}\n\n{info_text}"
+
+    value_allowed=choices_values + index_values
+    value_suggestions=choices_values
+    
+    response = prompt_string(
+        info_text=prompt_text,
+        value_allowed=value_allowed,
+        value_suggestion=value_suggestion,
+        value_suggestions=value_suggestions
     )
     
-def prompt_list():
-    pass
+    
+    if response in index_values:
+        return response
+    else:
+        return index_values[value_allowed.index(response)]

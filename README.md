@@ -50,4 +50,29 @@ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/
 - Job submission
 - Automatic job conda environment setup
 - Monitoring of recent output, errors, and program output
-- Killing of newest job
+- Killing of jobs
+
+# CLI
+```
+Sprinkle streamlines management of LSF jobs.
+
+Project repository: https://github.com/sarphiv/sprinkle
+
+
+Usage:
+  sprinkle start [--] [<args>...]                           Submit the job script and pass <args> to job script.
+                                                            If <args> contains dashes, 
+                                                            add the two dashes "--" before <args>.
+  sprinkle stop [<job_id>... | -a | --all]                  Stop specific jobs or all jobs.
+                                                            If nothing specified, prompt to select job to kill.
+  sprinkle view [((--output | --log | --error) <job_id>)]   View output, log, or errors of a specific job.
+  sprinkle status                                           See overview of job details.
+  sprinkle settings                                         Set up or change existing job settings.
+  sprinkle export [path]                                    Export submission script to path. 
+                                                            Defaults to working directory.
+  sprinkle [help | -h | -? | --help]                        Show this screen.
+
+Options:
+  -h -? --help       Show this screen.
+  -a --all           Kill all jobs
+```

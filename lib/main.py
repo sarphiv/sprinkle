@@ -1,3 +1,20 @@
+doc_short = \
+"""
+Usage:
+  sprinkle start [--] [<args>...]
+  sprinkle stop [<job_id>... | -a | --all]
+  sprinkle view [((output | log | error) <job_id>)]
+  sprinkle status
+  sprinkle settings
+  sprinkle export [path]
+  sprinkle [help | --help | -h | -?]
+
+Options:
+  -h -? --help       Show full help text.
+  -a --all           Kill all jobs
+"""
+
+doc_full = \
 """
 Sprinkle streamlines management of LSF jobs.
 
@@ -5,22 +22,36 @@ Project repository: https://github.com/sarphiv/sprinkle
 
 
 Usage:
-  sprinkle start [--] [<args>...]                           Submit the job script and pass <args> to job script.
-                                                            If <args> contains dashes, 
-                                                            add the two dashes "--" before <args>.
-  sprinkle stop [<job_id>... | -a | --all]                  Stop specific jobs or all jobs.
-                                                            If nothing specified, prompt to select job to kill.
-  sprinkle view [((--output | --log | --error) <job_id>)]   View output, log, or errors of a specific job.
-  sprinkle status                                           See overview of job details.
-  sprinkle settings                                         Set up or change existing job settings.
-  sprinkle export [path]                                    Export submission script to path. 
-                                                            Defaults to working directory.
-  sprinkle [help | -h | -? | --help]                        Show this screen.
+  sprinkle start [--] [<args>...]
+    Submit the job script and pass <args> to job script.
+    If <args> contains dashes, add the two dashes "--" before <args>.
+
+  sprinkle stop [<job_id>... | -a | --all]
+    Stop specific jobs or all jobs.
+    If nothing specified, prompt to select job to kill.
+
+  sprinkle view [((output | log | error) <job_id>)]
+    View output, log, or errors of a specific job.
+
+  sprinkle status
+    See overview of job details.
+
+  sprinkle settings
+    Set up or change existing job settings.
+
+  sprinkle export [path]
+    Export submission script to path. 
+    Defaults to working directory.
+
+  sprinkle [help | -h | -? | --help]
+    Show this screen.
+
 
 Options:
-  -h -? --help       Show this screen.
+  -h -? --help       Show full help text.
   -a --all           Kill all jobs
 """
+
 
 import sys
 import inspect
@@ -119,39 +150,55 @@ class Command:
 
         # Return successful
         return True
+    
+    
+    def help() -> int:
+        print(doc_full)
+        return 0
 
 
 
 try:
+    # Parse args with docpie
+    args = docpie(doc_short, help=False, attachvalue=False, appearedonly=True)
+    # Filter empty args
+    args = { 
+        key: value 
+        for key, value 
+        in args.items() 
+        if value != False 
+           and not (    isinstance(value, list) 
+                    and len(value) == 0)
+    }
+
+
     
-    prompt_settings(JobSettings())
+    thing = prompt_settings(JobSettings())
+    print(thing)
 
-    docpie(__doc__, attachvalue=False, appearedonly=True)
-except KeyboardInterrupt:
-    exit(-1)
-
-def main(args: list[str]):
-    methods = inspect.getmembers(Command, predicate=inspect.isroutine)
-    methods = {name: method for name, method in methods if not name.startswith('_')}
-    
-    exit_code = 0
-
-    if not args or len(args) == 0:
+    if "start" in args:
+        pass
+    elif "stop" in args:
+        pass
+    elif "view" in args:
+        pass
+    elif "status" in args:
+        pass
+    elif "settings" in args:
+        pass
+    elif "export" in args:
+        pass
+    elif len(args) == 0 or len({"help", "--help", "-h", "-?"}.intersection(args)) > 0:
         exit_code = Command.help()
-    elif args[0].lower() not in methods:
-        print(f'Unknown command: "{args[0]}"\nRun "sprinkle help" for guidance.')
-        exit_code = 1
     else:
-        exit_code = int(not methods[args[0].lower()](args[1:]))
+        exit_code = 1
 
 
+    # Exit with exit code from above
     exit(exit_code)
 
-
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
+except (KeyboardInterrupt, EOFError):
+    exit(-1)
 
 
 # print(f'Suggested values: {["@student.dtu.dk", "@dtu.dk" "@gmail.com", "gmail.dk", "@yahoo.com", "yahoo.dk" "hotmail.com" "@hotmail.dk", "@outlook.com", "@outlook.dk", "@msn.dk", "@msn.com"]:<8}')
@@ -191,6 +238,8 @@ if __name__ == "__main__":
 #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
 #TODO: Check if sprinkle project output directories exist before monitoring
 #TODO: Error if job submission failed
+
+# TODO: Investigate whether to use conda update --phrune instead of fully recreating
 
 #TODO: Update readme.md when done, remember to remove WIP at top
 
