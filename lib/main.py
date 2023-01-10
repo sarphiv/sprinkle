@@ -88,16 +88,13 @@ except (KeyboardInterrupt, EOFError):
 #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
 #TODO: Disclaimer on first run
 
-#TODO: Handle case where JobOptions changed between versions, and existing loads may not work
+    #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
 #TODO: Check if sprinkle project output directories exist before monitoring
 #TODO: Error if job submission failed
 
-# TODO: Investigate whether to use conda update --phrune instead of fully recreating
+#TODO: Investigate whether to use conda update --phrune instead of fully recreating
 
 #TODO: Update readme.md when done, remember to remove WIP at top
-
-#TODO: Should also support running from the server
-#TODO: Start, monitor, generate start script
 
 #TODO: Add dev flag to pull from dev instead
 #TODO: Feature to scp back everything

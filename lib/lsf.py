@@ -1,7 +1,8 @@
 from enum import Enum
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import islice
+from varname import nameof
 import pickle
 import os
 import subprocess
@@ -42,6 +43,8 @@ class JobDetails:
     status: str
     cpu_usage: Optional[str]
     mem_usage: Optional[str]
+    mem_usage_avg: Optional[str]
+    mem_usage_max: Optional[str]
     time_start: str
     time_elapsed: str
 
@@ -144,42 +147,81 @@ def view_job(details: JobDetails, directory: str) -> bool:
 
 
 def get_jobs_active() -> dict[str, JobDetails]:
+    # WARN: Race condition possible. Solving via ostrich algorithm.
+
     # Get job status
-    status = subprocess.run(
+    status_meta = subprocess.run(
         ["bstat"], 
         stdout=subprocess.PIPE, 
         stderr=subprocess.PIPE,
         encoding="ascii"
     )
-    
+    status_cpu = subprocess.run(
+        ["bstat", "-C"], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE,
+        encoding="ascii"
+    )
+    status_mem = subprocess.run(
+        ["bstat", "-M"], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE,
+        encoding="ascii"
+    )
+
+
     # If there were no jobs, return nothing    
-    if status.stdout == '':
+    if status_meta.stdout == '':
         return {}
-    # Else there were jobs, parse and return job details
-    else:
-        # Store details
-        job_details = {}
-
-        # For each line in status message, skip header, parse jobs
-        for line in islice(status.stdout.splitlines(), 1, None):
-            # Parse job details
-            details = re.findall(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\S ]+)\s+(\S+)", line)[0]
-            
-            # Instantiate job details object
-            job_details[details[0]] = JobDetails(
-                name_short=details[3],
-                job_id=details[0],
-                queue=details[2],
-                status=details[5],
-                cpu_usage=None,
-                mem_usage=None,
-                time_start=details[6].strip(),
-                time_elapsed=details[7]
-            )
 
 
-        # Return details about all active jobs
-        return job_details
+    # Parse and return job details
+    
+    # Store details
+    job_details = {}
+
+    # For each line in meta status message, skip header, parse jobs
+    for line in islice(status_meta.stdout.splitlines(), 1, None):
+        # Parse meta details
+        meta = re.findall(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\S ]+)\s+(\S+)", line)[0]
+        
+        # Instantiate job details object
+        job_details[meta[0]] = JobDetails(
+            name_short=meta[3],
+            job_id=meta[0],
+            queue=meta[2],
+            status=meta[5],
+            cpu_usage=None,
+            mem_usage=None,
+            mem_usage_avg=None,
+            mem_usage_max=None,
+            time_start=meta[6].strip(),
+            time_elapsed=meta[7]
+        )
+
+    # For each line in cpu status message, skip header, parse jobs
+    cpu_attr = nameof(JobDetails.cpu_usage)
+    for line in islice(status_cpu.stdout.splitlines(), 1, None):
+        # Parse cpu details
+        cpu = re.findall(r"(\S+)\s+(?:\S+\s+){5}(\S+)", line)[0]
+        
+        # Set cpu usage
+        job_details[cpu[0]] = replace(job_details[cpu[0]], **{cpu_attr: cpu[1]})
+
+    # For each line in memory status message, skip header, parse jobs
+    mem_attr = nameof(JobDetails.mem_usage)
+    mem_avg_attr = nameof(JobDetails.mem_usage_avg)
+    mem_max_attr = nameof(JobDetails.mem_usage_max)
+    for line in islice(status_mem.stdout.splitlines(), 1, None):
+        # Parse memory details
+        mem = re.findall(r"(\S+)\s+(?:\S+\s+){4}(\S+)\s+(\S+)\s+(\S+)\s+\S+\s+", line)[0]
+        
+        # Set memory usage
+        job_details[mem[0]] = replace(job_details[mem[0]], **{mem_attr: mem[1], mem_avg_attr: mem[3], mem_max_attr: mem[2]})
+
+
+    # Return details about all active jobs
+    return job_details
 
 
 

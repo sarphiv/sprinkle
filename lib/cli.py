@@ -197,8 +197,7 @@ class Command:
 
 
     def status() -> int:
-        # TODO: Output status overview of job details
-        pass
+        print(get_jobs_active())
 
 
  
