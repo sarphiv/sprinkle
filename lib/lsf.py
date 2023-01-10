@@ -71,7 +71,7 @@ def load_settings() -> Optional[JobSettings]:
 
 
 
-def submit_job(settings: JobSettings) -> str:
+def submit_job(settings: JobSettings, args: list[str] = []) -> str:
     # If sprinkle directories do not exist for project, create them
     for dir in [sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir]:
         if not os.path.isdir(dir):
@@ -81,7 +81,7 @@ def submit_job(settings: JobSettings) -> str:
     submission = subprocess.run(
         ["bsub"], 
         stdout=subprocess.PIPE, 
-        input=generate_bsub_script(settings),
+        input=generate_bsub_script(settings, args),
         encoding="ascii"
     )
     
@@ -103,7 +103,7 @@ def view_job(details: JobDetails, directory: str) -> bool:
     pass
 
 
-def get_active_jobs() -> dict[str, JobDetails]:
+def get_jobs_active() -> dict[str, JobDetails]:
     # Get job status
     status = subprocess.run(
         ["bstat"], 
@@ -142,7 +142,7 @@ def get_active_jobs() -> dict[str, JobDetails]:
 
 
 
-def generate_bsub_script(settings: JobSettings) -> str: 
+def generate_bsub_script(settings: JobSettings, args: list[str] = []) -> str: 
     def conditional_string(condition, string, end="\n"):
         return string + end if condition else ""
 
@@ -236,7 +236,7 @@ fi
 
 
 # Run job script and save output to file
-{settings.script} > {sprinkle_project_output_dir}/%J-{settings.name}.txt
+{settings.script} {" ".join(args)} > {sprinkle_project_output_dir}/%J-{settings.name}.txt
 
 """
 +

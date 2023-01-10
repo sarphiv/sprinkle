@@ -5,7 +5,7 @@ from dataclasses import replace
 import re
 
 from prompt import prompt_range_integer, prompt_path, prompt_string, prompt_regex, prompt_boolean, prompt_choice
-from lsf import JobSettings, JobDetails, get_active_jobs
+from lsf import JobSettings, JobDetails, get_jobs_active
 
 
 # Track whether module initialized
@@ -266,9 +266,12 @@ def prompt_settings(settings_current: JobSettings) -> Optional[JobSettings]:
 
 
 
-def prompt_active_jobs() -> Optional[str]:
-    # Get active job details
-    job_details = get_active_jobs()
+def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> Optional[dict[str, JobDetails]]:
+    if jobs_active is None:
+        # Get active job details
+        job_details = get_jobs_active()
+    else:
+        job_details = jobs_active
     
     # If no active jobs, return None
     if len(job_details) == 0:

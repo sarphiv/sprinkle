@@ -22,17 +22,36 @@ try:
 
 
     if "start" in args:
-        pass
+        exit_code = Command.start(
+            args["<args>"] if "<args>" in args else 
+                []
+        )
     elif "stop" in args:
-        pass
+        exit_code = Command.stop(
+            args["<job_id>"] if "<job_id>" in args else 
+                "all" if "-a" in args else 
+                []
+        )
     elif "view" in args:
-        pass
+        exit_code = Command.view(
+            "output" if "output" in args else
+                "log" if "log" in args else
+                "error" if "error" in args else 
+                None,
+            args["<job_id>"] if "<job_id>" in args else 
+                None
+        )
     elif "status" in args:
-        pass
+        exit_code = Command.status()
     elif "settings" in args:
         exit_code = Command.settings()
     elif "export" in args:
-        exit_code = Command.export(args["<path>"] if "<path>" in args else None)
+        exit_code = Command.export(
+            args["<path>"] if "<path>" in args else 
+                [],
+            args["<args>"] if "<args>" in args else 
+                []
+        )
     elif len(args) == 0 or len({"help", "--help", "-h", "-?"}.intersection(args)) > 0:
         exit_code = Command.help()
     else:
@@ -52,7 +71,6 @@ except (KeyboardInterrupt, EOFError):
     #TODO: Save bsub options in file and output status whether this file exists for the project yet (in current working directory)
     #TODO: When trying to edit options again, display current settings instead of default recommendations
     #TODO: running start, just submits based off of the options
-#TODO: Options selection screen with overview, select option to open prompt
     #TODO: Allow users to also input arguments for their script target
     #TODO: Ability to use sprinkle by e.g. 
     #  sprinkle start [args...] (if no options for project, prompt user for first time project setup)

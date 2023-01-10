@@ -1,10 +1,11 @@
 import os
 import traceback
-from typing import Optional
+from typing import Union, Optional, Literal
 
 from constants import sprinkle_project_settings_export_file
-from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job
-from lsf_prompt import prompt_settings
+from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active
+from lsf_prompt import prompt_settings, prompt_jobs_active
+
 
 
 doc_short = \
@@ -15,7 +16,7 @@ Usage:
   sprinkle view [((output | log | error) <job_id>)]
   sprinkle status
   sprinkle settings
-  sprinkle export [<path>]
+  sprinkle export [<path>] [--] [<args>...]
   sprinkle [help | --help | -h | -?]
 
 Options:
@@ -48,8 +49,9 @@ Usage:
   sprinkle settings
     Set up or change existing job settings.
 
-  sprinkle export [<path>]
+  sprinkle export [<path>] [<args>...]
     Export submission script to path. 
+    If <args> contains dashes, add the two dashes "--" before <args>.
     Defaults to working directory.
 
   sprinkle [help | -h | -? | --help]
@@ -60,6 +62,7 @@ Options:
   -h -? --help       Show full help text.
   -a --all           Kill all jobs
 """
+
 
 
 class Command:
@@ -85,7 +88,7 @@ class Command:
 
 
 
-    def start(arguments: Optional[list[str]]) -> int:
+    def start(args: list[str] = []) -> int:
         # Load settings
         settings = Command._load_or_create_settings()
         # If no settings, return failure
@@ -94,10 +97,10 @@ class Command:
 
 
         # Submit job script
-        job_id = submit_job(settings)
+        job_id = submit_job(settings, args)
 
         # Print job ID
-        print(f'Started job (Name: "{settings.name}", ID: "{job_id}", Command: "{settings.script} {arguments}")')
+        print(f'Started job (Name: "{settings.name}", ID: "{job_id}", Script: "{settings.script} {" ".join(args)}")')
 
 
         # Return successful
@@ -105,27 +108,69 @@ class Command:
 
 
 
-    def stop(args) -> bool:
-        if len(args) == 0:
-            # TODO: list prompt to select jobs to kill
-            # TODO: Remember option to kill all jobs
-            pass
-        elif len(args) == 1 and args[0] == "--all":
-            # TODO: Kill all
-            pass
+    def stop(job_ids: Union[Literal["all"], list[str]] = []) -> int:
+        # WARN: Not handling case where jobs finish while executing this code
+
+        # Get active jobs 
+        job_start_ids = set(get_jobs_active().keys())
+        job_not_found_ids = set()
+
+        # If all jobs should be killed, mark all for killing
+        if job_ids == "all":
+            job_kill_ids = job_start_ids
+        # Else if no jobs provided, prompt for active jobs to kill
+        elif len(job_ids) == 0:
+            job_kill_ids = set(prompt_jobs_active(job_start_ids).keys())
+        # Else jobs provided, mark selected active jobs for killing
         else:
-            # TODO: Kill selected
-            killed_job_ids, not_killed_job_ids = kill_jobs(*args)
+            job_query_ids = set(job_ids)
+            job_kill_ids = job_start_ids & job_query_ids
+            job_not_found_ids = job_query_ids - job_kill_ids
+        
+
+        # Send kill signal
+        job_killed_ids, job_alive_ids = kill_jobs(list(job_kill_ids))
+
+
+        # Track whether any jobs were killed and that all were killed successfully.
+        # Inform of the above status.
+        success = False
+
+        if len(job_killed_ids) > 0:
+            print(f"Successfully Killed jobs: {', '.join(job_killed_ids)}")
+            success = True
+
+        if len(job_alive_ids) > 0:
+            print(f"Failed killing jobs: {', '.join(job_alive_ids)}")
+            success = False
+
+        if len(job_not_found_ids) > 0:
+            print(f"Failed finding jobs: {', '.join(job_not_found_ids)}")
+            success = False
+
+
+        # Return exit code
+        return 0 if success else 1
 
 
 
-    def view(args) -> bool:
+    def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
         # TODO: Not implemented
+        
+        # NOTE: Because of docpie, either both are none, or both are not none
+        
+
+        # if none, prompt view, and job
+        
+        # else, check for valid job (check file, not active, since want to be able to see finished jobs too)
+
+        # if valid, view
+        
         pass
 
 
 
-    def status() -> bool:
+    def status() -> int:
         # TODO: Output status overview of job details
         pass
 
@@ -148,7 +193,7 @@ class Command:
 
 
 
-    def export(path: Optional[str]) -> int:
+    def export(path: Optional[str], args: list[str] = []) -> int:
         # If no save path provided, use default path
         if not path:
             path = sprinkle_project_settings_export_file
@@ -162,7 +207,7 @@ class Command:
 
 
         # Get submission script
-        script = generate_bsub_script(settings)
+        script = generate_bsub_script(settings, args)
 
         # Attempt writing script to file
         try:
