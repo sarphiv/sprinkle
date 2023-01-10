@@ -290,7 +290,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
         choices=[
             [[job.name_short, job.job_id, job.queue, job.status, job.time_start, job.time_elapsed]
                 for job in job_details.values()], 
-            [[["Cancel"]]]
+            [["Cancel"]]
         ],
         index=[[str(i) for i in range(len(job_details))], ["c"]],
         headers=["Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],

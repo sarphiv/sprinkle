@@ -186,8 +186,31 @@ class Command:
     def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
         # NOTE: Because of docpie, either both are none, or both are not none
         if not type and not job_id:
-            job_id = prompt_job_active().job_id
-            type = prompt_choice("Choose view type", ["Output", "Log", "Error"])
+            # Prompt for type
+            types = ["Output", "Log", "Error"]
+            type = prompt_choice(
+                "Choose view type", 
+                choices=[types, ["Cancel"]],
+                index=[[str(i) for i in range(len(types))], ['c']],
+                value_suggestions=None
+            )
+            
+            if type == 'c':
+                print("No view type selected")
+                return 1
+            else:
+                type = types[int(type)]
+
+
+            # Prompt for active job
+            job_details = prompt_job_active()
+
+            if job_details is None:
+                print("No job selected to view")
+                return 1
+            else:
+                job_id = job_details.job_id
+            
 
         # View job
         success = view_job(type, job_id)
