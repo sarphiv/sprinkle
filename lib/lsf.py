@@ -94,8 +94,49 @@ def submit_job(settings: JobSettings, args: list[str] = []) -> str:
 
 
 def kill_jobs(job_ids: list[str]) -> tuple[list[str], list[str]]:
-    pass
-    #TODO: Return jobs that were killed and not killed
+    # If no jobs to kill, return nothing
+    if len(job_ids) == 0:
+        return [], []
+
+
+    # Send kill command
+    killed = subprocess.run(
+        ["bsub"], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE, 
+        input=" ".join(job_ids),
+        encoding="ascii"
+    )
+
+
+    # Parse killed and not killed job ids
+    success = []
+    failure = []
+    for line in killed.stdout.splitlines():
+        match = re.findall(r"Job <(\d+)> is being terminated", line)
+        if match:
+            success.append(match[0])
+            continue
+        
+        match = re.findall(r"Job <(\d+)>: No matching job found", line)
+        if match:
+            failure.append(match[0])
+            continue
+
+        match = re.findall(r"Job <(\d+)>: Job has already finished", line)
+        if match:
+            failure.append(match[0])
+            continue
+
+
+        # No known message was seen. Warn user
+        print(f"WARNING: Unknown kill job message: {line}\nPlease share this with a sprinkle developer")
+
+
+
+    # Return jobs killed and not killed
+    return success, failure
+
 
 
 def view_job(details: JobDetails, directory: str) -> bool:
@@ -123,7 +164,7 @@ def get_jobs_active() -> dict[str, JobDetails]:
         # For each line in status message, skip header, parse jobs
         for line in islice(status.stdout.splitlines(), 1, None):
             # Parse job details
-            details = re.findall("([^\s]+)", line)
+            details = re.findall(r"([^\s]+)", line)
             
             # Instantiate job details object
             job_details[details[0]] = JobDetails(
