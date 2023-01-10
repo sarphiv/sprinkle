@@ -287,8 +287,8 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
                 [['', "Finish"], ['', "Cancel"]]
              ],
             index=[[str(i) for i in range(len(selected))], ["f", "c"]],
-            headers=[" ", "Short name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
-            value_suggestions=["Finish", "Cancel"]
+            headers=["", "Short name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
+            value_suggestions=None
         )
 
 
