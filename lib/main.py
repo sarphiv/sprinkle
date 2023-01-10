@@ -67,14 +67,22 @@ from lsf_prompt import prompt_settings
 
 
 class Command:
-    def start(arguments: Optional[str]) -> bool:
+    def start(arguments: Optional[str]) -> int:
         # Load settings
         settings = load_settings()
-        # If no settings loaded, create and save settings
+
+        # If no settings available, attempt creating
         if not settings:
             settings = prompt_settings(JobSettings())
+            
+            # If settings prompt cancelled, return failure
+            if not settings:
+                return 1
+
+            # Save new settings
             save_settings(settings)
-        
+
+
         # Submit job script
         job_id = submit_job(settings)
 
@@ -107,19 +115,20 @@ class Command:
         pass
 
 
-    def settings() -> bool:
+    def settings() -> int:
         # Load settings
         settings = load_settings() or JobSettings()
         
         # Prompt about settings
         settings = prompt_settings(settings)
         
-        # Save settings
-        save_settings(settings)
-
-
-        # Return successful
-        return True
+        # If settings changed, save settings and return success
+        if settings:
+            save_settings(settings)
+            return 0
+        # Else settings not changed, return failure
+        else:
+            return 1
 
 
     def export(args) -> bool:

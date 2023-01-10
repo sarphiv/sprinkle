@@ -155,11 +155,13 @@ def prompt_boolean(
 def prompt_path(
     info_text: str,
     path_type: Literal["file", "directory"] = "file",
+    value_allow_empty: bool = False,
     value_suggestion: str = None, 
 ) -> str:
     return prompt_base(
         info_text,
-        Validator.from_callable(os.path.isfile if path_type == "file" else os.path.isdir),
+        Validator.from_callable(lambda s: (value_allow_empty and s == "") 
+                                       or (os.path.isfile(s) if path_type == "file" else os.path.isdir(s))),
         value_suggestion,
         FuzzyCompleter(PathCompleter(only_directories=path_type == "directory", expanduser=True), )
     )

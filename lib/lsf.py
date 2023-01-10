@@ -16,7 +16,7 @@ class JobSettings:
     env_name: str                       = "default-env-name"
     env_on_done_delete: bool            = True
 
-    working_dir: Optional[str]          = None
+    working_dir: str                    = ""
     env_spec: str                       = "environment.yml"
     script: str                         = "python main.py"
 

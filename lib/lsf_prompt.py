@@ -59,13 +59,19 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = {
 
 
 # Prompting
-def prompt_new_string(attr: str, value_current: str, value_default: str) -> str:
-    name, formatter = job_settings_formatter[attr]
+def prompt_new_string(allow_empty: bool = False) -> Callable[[str, str, str], str]:
+    def prompt(attr: str, value_current: str, value_default: str) -> str:    
+        name, formatter = job_settings_formatter[attr]
 
-    return {attr: prompt_string(
-        f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-        str_disallowed=[" "],
-    )}
+        return {attr: prompt_string(
+            f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
+            value_disallowed=None if allow_empty else [""],
+            str_disallowed=[" "],
+            value_suggestion=formatter(value_default) if allow_empty else None
+        )}
+
+
+    return prompt
 
 
 def prompt_new_boolean(attr: str, value_current: bool, value_default: bool) -> bool:
@@ -88,22 +94,34 @@ def prompt_new_natural(attr: str, value_current: int, value_default: int) -> int
     )}
 
 
-def prompt_new_directory(attr: str, value_current: str, value_default: str) -> str:
-    name, formatter = job_settings_formatter[attr]
+def prompt_new_directory(allow_empty: bool = False) -> Callable[[str, str, str], str]:
+    def prompt(attr: str, value_current: str, value_default: str) -> str:
+        name, formatter = job_settings_formatter[attr]
 
-    return {attr: prompt_path(
-        f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-        path_type="directory"
-    )}
+        return {attr: prompt_path(
+            f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
+            path_type="directory",
+            value_allow_empty=allow_empty,
+            value_suggestion=formatter(value_default) if allow_empty else None
+        )}
 
 
-def prompt_new_file(attr: str, value_current: str, value_default: str) -> str:
-    name, formatter = job_settings_formatter[attr]
+    return prompt
 
-    return {attr: prompt_path(
-        f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-        path_type="file"
-    )}
+
+def prompt_new_file(allow_empty: bool = False) -> Callable[[str, str, str], str]:
+    def prompt(attr: str, value_current: str, value_default: str) -> str:
+        name, formatter = job_settings_formatter[attr]
+
+        return {attr: prompt_path(
+            f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
+            path_type="file",
+            value_allow_empty=allow_empty,
+            value_suggestion=formatter(value_default) if allow_empty else None
+        )}
+
+
+    return prompt
 
 
 def prompt_new_time(attr: str, value_current: str, value_default: str) -> str:
@@ -137,13 +155,13 @@ def prompt_new_queue(attr: str, value_current: str, value_default: str) -> str:
 
 
 job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = {
-    f"{nameof(JobSettings.name)}": prompt_new_string,
-    f"{nameof(JobSettings.env_name)}": prompt_new_string,
+    f"{nameof(JobSettings.name)}": prompt_new_string(allow_empty=False),
+    f"{nameof(JobSettings.env_name)}": prompt_new_string(allow_empty=False),
     f"{nameof(JobSettings.env_on_done_delete)}": prompt_new_boolean,
 
-    f"{nameof(JobSettings.working_dir)}": prompt_new_directory,
-    f"{nameof(JobSettings.env_spec)}": prompt_new_file,
-    f"{nameof(JobSettings.script)}": prompt_new_string,
+    f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
+    f"{nameof(JobSettings.env_spec)}": prompt_new_file(allow_empty=False),
+    f"{nameof(JobSettings.script)}": prompt_new_string(allow_empty=False),
 
     f"{nameof(JobSettings.time_max)}": prompt_new_time,
     f"{nameof(JobSettings.queue)}": prompt_new_queue,
@@ -153,7 +171,7 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = {
     f"{nameof(JobSettings.cpu_mem_per_core_mb)}": prompt_new_natural,
     f"{nameof(JobSettings.cpu_mem_max_gb)}": prompt_new_natural,
 
-    f"{nameof(JobSettings.email)}": prompt_new_string,
+    f"{nameof(JobSettings.email)}": prompt_new_string(allow_empty=True),
 
     # Skipping: version
 }
