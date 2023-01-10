@@ -57,8 +57,13 @@ def save_settings(settings: JobSettings) -> None:
 
 
 def load_settings() -> Optional[JobSettings]:
-    #TODO: Make sure file actually exists
-    with open(f"{sprinkle_project_dir}/{sprinkle_project_settings_file}", "rb") as file:
+    settings_file_path = f"{sprinkle_project_dir}/{sprinkle_project_settings_file}"
+    
+    if not os.path.isfile(settings_file_path):
+        return None
+
+
+    with open(settings_file_path, "rb") as file:
         settings = pickle.load(file)
 
     return settings if JobSettings.version == settings.version else None
@@ -141,7 +146,7 @@ def generate_bsub_script(settings: JobSettings) -> str:
     def conditional_string(condition, string, end="\n"):
         return string + end if condition else ""
 
-    return (f"""
+    return (f"""\
 #!/bin/bash
 ### Job name
 #BSUB -J {settings.name}

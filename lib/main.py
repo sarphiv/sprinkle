@@ -1,169 +1,8 @@
-doc_short = \
-"""
-Usage:
-  sprinkle start [--] [<args>...]
-  sprinkle stop [<job_id>... | -a | --all]
-  sprinkle view [((output | log | error) <job_id>)]
-  sprinkle status
-  sprinkle settings
-  sprinkle export [path]
-  sprinkle [help | --help | -h | -?]
-
-Options:
-  -h -? --help       Show full help text.
-  -a --all           Kill all jobs
-"""
-
-doc_full = \
-"""
-Sprinkle streamlines management of LSF jobs.
-
-Project repository: https://github.com/sarphiv/sprinkle
-
-
-Usage:
-  sprinkle start [--] [<args>...]
-    Submit the job script and pass <args> to job script.
-    If <args> contains dashes, add the two dashes "--" before <args>.
-
-  sprinkle stop [<job_id>... | -a | --all]
-    Stop specific jobs or all jobs.
-    If nothing specified, prompt to select job to kill.
-
-  sprinkle view [((output | log | error) <job_id>)]
-    View output, log, or errors of a specific job.
-
-  sprinkle status
-    See overview of job details.
-
-  sprinkle settings
-    Set up or change existing job settings.
-
-  sprinkle export [path]
-    Export submission script to path. 
-    Defaults to working directory.
-
-  sprinkle [help | -h | -? | --help]
-    Show this screen.
-
-
-Options:
-  -h -? --help       Show full help text.
-  -a --all           Kill all jobs
-"""
-
-
 import sys
 import inspect
-from typing import Optional
 
 from docpie import docpie
-
-from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job
-from lsf_prompt import prompt_settings
-
-
-
-
-
-class Command:
-    def start(arguments: Optional[str]) -> int:
-        # Load settings
-        settings = load_settings()
-
-        # If no settings available, attempt creating
-        if not settings:
-            settings = prompt_settings(JobSettings())
-            
-            # If settings prompt cancelled, return failure
-            if not settings:
-                return 1
-
-            # Save new settings
-            save_settings(settings)
-
-
-        # Submit job script
-        job_id = submit_job(settings)
-
-        # Print job ID
-        print(f'Started job (Name: "{settings.name}", ID: "{job_id}", Command: "{settings.script} {arguments}")')
-
-
-        # Return successful
-        return True
-
-
-    def stop(args) -> bool:
-        if len(args) == 0:
-            # TODO: list prompt to select jobs to kill
-            # TODO: Remember option to kill all jobs
-            pass
-        elif len(args) == 1 and args[0] == "--all":
-            # TODO: Kill all
-            pass
-        else:
-            # TODO: Kill selected
-            killed_job_ids, not_killed_job_ids = kill_jobs(*args)
-        
-    def view(args) -> bool:
-        # TODO: Not implemented
-        pass
-            
-    def status() -> bool:
-        # TODO: Output status overview of job details
-        pass
-
-
-    def settings() -> int:
-        # Load settings
-        settings = load_settings() or JobSettings()
-        
-        # Prompt about settings
-        settings = prompt_settings(settings)
-        
-        # If settings changed, save settings and return success
-        if settings:
-            save_settings(settings)
-            return 0
-        # Else settings not changed, return failure
-        else:
-            return 1
-
-
-    def export(args) -> bool:
-        # Load settings
-        settings = load_settings()
-        # If no settings loaded, create and save settings
-        if not settings:
-            settings = prompt_settings(JobSettings())
-            save_settings(settings)
-
-
-        if len(args) == 0:
-            path = sprinkle_project_settings_export_file
-        elif len(args) == 1:
-            # TODO: Verify path is a file path
-            # TODO: Create necessary folders
-            
-            path = args[0]
-        else:
-            # TODO: inform of incorrect usage
-            pass
-            
-            
-        # Save export to chosen path
-        script = generate_bsub_script(settings)
-        # TODO: Write contents to chosen path
-
-
-        # Return successful
-        return True
-    
-    
-    def help() -> int:
-        print(doc_full)
-        return 0
+from cli import doc_short, Command
 
 
 
@@ -178,12 +17,9 @@ try:
         if value != False 
            and not (    isinstance(value, list) 
                     and len(value) == 0)
+           and not (value is None)
     }
 
-
-    
-    thing = prompt_settings(JobSettings())
-    print(thing)
 
     if "start" in args:
         pass
@@ -194,9 +30,9 @@ try:
     elif "status" in args:
         pass
     elif "settings" in args:
-        pass
+        exit_code = Command.settings()
     elif "export" in args:
-        pass
+        exit_code = Command.export(args["<path>"] if "<path>" in args else None)
     elif len(args) == 0 or len({"help", "--help", "-h", "-?"}.intersection(args)) > 0:
         exit_code = Command.help()
     else:
@@ -210,24 +46,12 @@ except (KeyboardInterrupt, EOFError):
     exit(-1)
 
 
-# print(f'Suggested values: {["@student.dtu.dk", "@dtu.dk" "@gmail.com", "gmail.dk", "@yahoo.com", "yahoo.dk" "hotmail.com" "@hotmail.dk", "@outlook.com", "@outlook.dk", "@msn.dk", "@msn.com"]:<8}')
-
-# completer = FuzzyWordCompleter(["@student.dtu.dk", "@dtu.dk" "@gmail.com", "gmail.dk", "@yahoo.com", "yahoo.dk" "hotmail.com" "@hotmail.dk", "@outlook.com", "@outlook.dk", "@msn.dk", "@msn.com"])
-# validator = ThreadedValidator(Validator.from_callable(lambda text: text.isdigit()))
-
-
-# print("test me")
-
-# exit(0)
-
-
-
 
 #TODO: Ok, maybe MVP first instead...
-#TODO: file for default bsub options, and base recommendations off of these
-#TODO: Save bsub options in file and output status whether this file exists for the project yet (in current working directory)
-#TODO: When trying to edit options again, display current settings instead of default recommendations
-#TODO: running start, just submits based off of the options
+    #TODO: file for default bsub options, and base recommendations off of these
+    #TODO: Save bsub options in file and output status whether this file exists for the project yet (in current working directory)
+    #TODO: When trying to edit options again, display current settings instead of default recommendations
+    #TODO: running start, just submits based off of the options
 #TODO: Options selection screen with overview, select option to open prompt
     #TODO: Allow users to also input arguments for their script target
     #TODO: Ability to use sprinkle by e.g. 
