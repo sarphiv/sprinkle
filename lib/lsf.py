@@ -14,7 +14,7 @@ from constants import sprinkle_project_dir, sprinkle_project_settings_file, spri
 class JobSettings:
     name: str                           = "default-job-name"
     env_name: str                       = "default-env-name"
-    env_on_done_delete: bool            = True
+    env_on_done_delete: bool            = False
 
     working_dir: str                    = ""
     env_spec: str                       = "environment.yml"

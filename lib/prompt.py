@@ -193,11 +193,11 @@ def prompt_boolean(
         value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
     """
     response = prompt_string(
-        info_text, 
-        value_true + value_false,
-        value_suggestion,
+        info_text,
+        value_allowed=value_true + value_false,
+        value_suggestions=value_suggestion,
         # Weave elements together [a, 1, b, 2] with length shortest list
-        [elem for pair in zip(value_true, value_false) for elem in pair]
+        value_suggestion=[elem for pair in zip(value_true, value_false) for elem in pair]
     )
 
     return response in value_true
