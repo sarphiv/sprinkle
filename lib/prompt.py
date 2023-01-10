@@ -234,7 +234,8 @@ def prompt_choice(
     choices: Union[list[str], list[list[str]], list[list[list[str]]]],
     index: Union[list[str], list[list[str]]] = None,
     headers: list[str] = None,
-    value_suggestion: str = ""
+    value_suggestion: str = "",
+    value_suggestions: Union[Literal["first column"], list[str], Completer] = "first column"
 ) -> str:
     """Prompts the user for a choice, and validates the input against a list of choices.
     
@@ -244,6 +245,7 @@ def prompt_choice(
         index (Union[list[str], list[list[str]]], optional): List of indexes or grouped indexes for choices. Defaults to None, which numerically 0-indexes the choices.
         headers (list[str], optional): List of headers for choices and their values. Defaults to None.
         value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
+        value_suggestions (Union[list[str], Completer], optional): Suggestions for auto-completion engine. Defaults to first column.
 
     Returns:
         str: User input that passes validation
@@ -297,9 +299,9 @@ def prompt_choice(
     prompt_text = f"{tabulate(choices_table, headers=headers, showindex=index_table)}\n\n{info_text}"
 
     # Set allowed values to be either choice or index values
-    value_allowed=choices_values + index_values
-    # Set suggestions to choices
-    value_suggestions=choices_values
+    value_allowed = choices_values + index_values
+    # Set suggestions
+    value_suggestions = choices_values if value_suggestions == "first column" else value_suggestions
     
     # Prompt user for input
     response = prompt_string(
