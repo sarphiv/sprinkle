@@ -17,7 +17,7 @@ Usage:
   sprinkle status
   sprinkle settings
   sprinkle export [<path>] [--] [<args>...]
-  sprinkle [help | --help | -h | -?]
+  sprinkle [help | -h | -? | --help]
 
 Options:
   -h -? --help       Show full help text.
@@ -143,6 +143,7 @@ class Command:
         # Else if no jobs provided, prompt for active jobs to kill, exit if none
         elif len(job_ids) == 0:
             job_kill_ids = set(prompt_jobs_active(job_active).keys())
+
             if len(job_kill_ids) == 0:
                 print("No jobs selected to stop")
                 return 1

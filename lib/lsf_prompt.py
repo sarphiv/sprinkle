@@ -265,6 +265,14 @@ def prompt_settings(settings_current: JobSettings) -> Optional[JobSettings]:
 
 
 def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, JobDetails]:
+    """Prompts user to select active jobs
+    
+    Args:
+        jobs_active (dict[str, JobDetails], optional): Active jobs. Defaults to None, which retrieves current active jobs.
+
+    Returns:
+        dict[str, JobDetails]: Selected jobs
+    """
     if jobs_active is None:
         # Get active job details
         job_details = get_jobs_active()
@@ -275,10 +283,12 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
     if len(job_details) == 0:
         return {}
 
-
+    # List of selected jobs
     selected = [False] * len(job_details)
 
+    # Continue prompting until jobs have been selected
     while True:
+        # Prompt to toggle job selection and finish/cancel
         response = prompt_choice(
             "Choose job(s)",
             choices=[
@@ -292,11 +302,13 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
         )
 
 
+        # If finish selection, return selection
         if response == "f":
             return {job.job_id: job for selected, job in zip(selected, job_details.values()) if selected}
+        # Else if cancel, return nothing to mean no selection
         elif response == "c":
             return {}
-
-
-        selected[int(response)] = not selected[int(response)]
+        # Else, toggle job selection
+        else:
+            selected[int(response)] = not selected[int(response)]
 
