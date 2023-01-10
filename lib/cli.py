@@ -130,6 +130,12 @@ class Command:
         job_active = get_jobs_active()
         job_start_ids = set(job_active.keys())
         job_not_found_ids = set()
+        
+        # If no jobs available, inform and exit
+        if len(job_start_ids) == 0:
+            print("No active jobs to stop")
+            return 1
+
 
         # If all jobs should be killed, mark all for killing
         if job_ids == "all":
@@ -138,6 +144,7 @@ class Command:
         elif len(job_ids) == 0:
             job_kill_ids = set(prompt_jobs_active(job_active).keys())
             if len(job_kill_ids) == 0:
+                print("No jobs selected to stop")
                 return 1
         # Else jobs provided, mark selected active jobs for killing
         else:

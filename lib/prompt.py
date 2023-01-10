@@ -298,11 +298,17 @@ def prompt_choice(
     # Create prompt text from table and info text
     prompt_text = f"{tabulate(choices_table, headers=headers, showindex=index_table)}\n\n{info_text}"
 
-    # Set allowed values to be either choice or index values
-    value_allowed = choices_values + index_values
-    # Set suggestions
-    value_suggestions = choices_values if value_suggestions == "first column" else value_suggestions
-    
+
+    if value_suggestions == "first column":
+        # Set allowed values to be either choice or index values
+        value_allowed = choices_values + index_values
+        # Set suggestions
+        value_suggestions = choices_values
+    else:    
+        # Set allowed values to be index values only
+        value_allowed = index_values
+
+
     # Prompt user for input
     response = prompt_string(
         info_text=prompt_text,

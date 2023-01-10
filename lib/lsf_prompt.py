@@ -284,11 +284,11 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
             choices=[
                 [['X' if selected[i] else " ", job.name_short, job.job_id, job.queue, job.status, job.time_start, job.time_elapsed]
                     for i, job in enumerate(job_details.values())], 
-                [["Finish"], ["Cancel"]]
+                [['', "Finish"], ['', "Cancel"]]
              ],
             index=[[str(i) for i in range(len(selected))], ["f", "c"]],
             headers=[" ", "Short name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
-            value_suggestions=None
+            value_suggestions=["Finish", "Cancel"]
         )
 
 
