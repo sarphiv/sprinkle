@@ -264,6 +264,47 @@ def prompt_settings(settings_current: JobSettings) -> Optional[JobSettings]:
 
 
 
+def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[JobDetails]:
+    """Prompts user to select active job
+    
+    Args:
+        jobs_active (dict[str, JobDetails], optional): Active jobs. Defaults to None, which retrieves current active jobs.
+
+    Returns:
+        JobDetails, optional: Selected job
+    """
+    if jobs_active is None:
+        # Get active job details
+        job_details = get_jobs_active()
+    else:
+        job_details = jobs_active
+
+    # If no active jobs, return nothing
+    if len(job_details) == 0:
+        return None
+
+
+    # Prompt to select job
+    response = prompt_choice(
+        "Choose job",
+        choices=[
+            [[job.name_short, job.job_id, job.queue, job.status, job.time_start, job.time_elapsed]
+                for job in job_details.values()], 
+            [[["Cancel"]]]
+        ],
+        index=[[str(i) for i in range(len(job_details))], ["c"]],
+        headers=["Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
+        value_suggestions=None
+    )
+
+    # If cancel, return nothing to mean no selection
+    if response == "c":
+        return None
+    # Else, return job details
+    else:
+        job_details.values()[int(response)]
+
+
 def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, JobDetails]:
     """Prompts user to select active jobs
     

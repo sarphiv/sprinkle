@@ -5,8 +5,9 @@ from typing import Union, Optional, Literal
 from tabulate import tabulate
 
 from constants import sprinkle_project_settings_export_file
-from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active
-from lsf_prompt import prompt_settings, prompt_jobs_active
+from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active, view_job
+from lsf_prompt import prompt_settings, prompt_job_active, prompt_jobs_active
+from prompt import prompt_choice
 
 
 
@@ -183,18 +184,16 @@ class Command:
 
 
     def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
-        # TODO: Not implemented
-        
         # NOTE: Because of docpie, either both are none, or both are not none
-        
+        if not type and not job_id:
+            job_id = prompt_job_active().job_id
+            type = prompt_choice("Choose view type", ["Output", "Log", "Error"])
 
-        # if none, prompt view, and job
-        
-        # else, check for valid job (check file, not active, since want to be able to see finished jobs too)
+        # View job
+        success = view_job(type, job_id)
 
-        # if valid, view
-        
-        pass
+        # Return exit code
+        return 0 if success else 1
 
 
 

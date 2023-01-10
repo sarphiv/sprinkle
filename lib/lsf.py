@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 from dataclasses import dataclass, replace
 from itertools import islice
 import pickle
@@ -141,11 +141,6 @@ def kill_jobs(job_ids: list[str]) -> tuple[list[str], list[str]]:
 
 
 
-def view_job(details: JobDetails, directory: str) -> bool:
-    # TODO: Implement viewing of job outputs
-    pass
-
-
 def get_jobs_active() -> dict[str, JobDetails]:
     # WARN: Race condition possible. Solving via ostrich algorithm.
 
@@ -236,6 +231,45 @@ def get_jobs_active() -> dict[str, JobDetails]:
     # Return details about all active jobs
     return job_details
 
+
+
+def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
+    # Get directory for file
+    match type:
+        case "output":
+            directory = sprinkle_project_output_dir
+        case "log":
+            directory = sprinkle_project_log_dir
+        case "error":
+            directory = sprinkle_project_error_dir
+    
+    # If directory does not exist, return failure
+    if not os.path.isdir(directory):
+        return False
+
+
+    # Search for associated file
+    directory_contents = os.listdir(directory)
+    file = ""
+    for content in directory_contents:
+        if job_id in content:
+            file = content
+            break
+    
+    # If file does not exist, return failure
+    if not os.isfile(file):
+        return False
+
+
+    # Track bottom of file
+    try:
+        subprocess.run(["tail", "-f", f"{directory}/{file}"])
+    except KeyboardInterrupt:
+        pass
+
+
+    # Return success
+    return True
 
 
 
