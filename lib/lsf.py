@@ -93,7 +93,7 @@ def submit_job(settings: JobSettings, args: list[str] = []) -> str:
     return job_id
 
 
-def kill_jobs(*job_ids: list[str]) -> tuple[list[str], list[str]]:
+def kill_jobs(job_ids: list[str]) -> tuple[list[str], list[str]]:
     pass
     #TODO: Return jobs that were killed and not killed
 
