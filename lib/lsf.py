@@ -183,8 +183,13 @@ def get_jobs_active() -> dict[str, JobDetails]:
     # For each line in meta status message, skip header, parse jobs
     for line in islice(status_meta.stdout.splitlines(), 1, None):
         # Parse meta details
-        meta = re.findall(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\S ]+)\s+(\S+)", line)[0]
-        
+        meta = re.findall(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\S ]+)\s+(\S+)", line)
+        if len(meta) == 0:
+            continue
+        else:
+            meta = meta[0]
+
+
         # Instantiate job details object
         job_details[meta[0]] = JobDetails(
             name_short=meta[3],
@@ -203,7 +208,11 @@ def get_jobs_active() -> dict[str, JobDetails]:
     cpu_attr = nameof(JobDetails.cpu_usage)
     for line in islice(status_cpu.stdout.splitlines(), 1, None):
         # Parse cpu details
-        cpu = re.findall(r"(\S+)\s+(?:\S+\s+){5}(\S+)", line)[0]
+        cpu = re.findall(r"(\S+)\s+(?:\S+\s+){5}(\S+)", line)
+        if len(cpu) == 0:
+            continue
+        else:
+            cpu = cpu[0]
         
         # Set cpu usage
         job_details[cpu[0]] = replace(job_details[cpu[0]], **{cpu_attr: cpu[1]})
@@ -214,7 +223,11 @@ def get_jobs_active() -> dict[str, JobDetails]:
     mem_max_attr = nameof(JobDetails.mem_usage_max)
     for line in islice(status_mem.stdout.splitlines(), 1, None):
         # Parse memory details
-        mem = re.findall(r"(\S+)\s+(?:\S+\s+){4}(\S+)\s+(\S+)\s+(\S+)\s+\S+\s+", line)[0]
+        mem = re.findall(r"(\S+)\s+(?:\S+\s+){4}(\S+)\s+(\S+)\s+(\S+)\s+\S+\s+", line)
+        if len(mem) == 0:
+            continue
+        else:
+            mem = mem[0]
         
         # Set memory usage
         job_details[mem[0]] = replace(job_details[mem[0]], **{mem_attr: mem[1], mem_avg_attr: mem[3], mem_max_attr: mem[2]})
