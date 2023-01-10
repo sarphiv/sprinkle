@@ -136,7 +136,7 @@ SPRINKLE_ENV_EXISTS=$?
 # If sprinkle environment does not exist or if it should be recreated, create environment
 if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
     echo -e "\n================== Creating sprinkle environment... =================="
-    conda env create -n ${SPRINKLE_ENV} -f ${SPRINKLE_CONDA_PACKAGES} -y
+    conda env create -n ${SPRINKLE_ENV} -f ${SPRINKLE_CONDA_PACKAGES}
 
     echo -e "==================   Created sprinkle environment   ==================\n"
 fi
