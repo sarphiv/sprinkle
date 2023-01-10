@@ -101,10 +101,9 @@ def kill_jobs(job_ids: list[str]) -> tuple[list[str], list[str]]:
 
     # Send kill command
     killed = subprocess.run(
-        ["bkill"], 
+        ["bkill"] + job_ids, 
         stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE, 
-        input=" ".join(job_ids),
+        stderr=subprocess.PIPE,
         encoding="ascii"
     )
 

@@ -152,15 +152,15 @@ class Command:
         success = False
 
         if len(job_killed_ids) > 0:
-            print(f"Successfully Killed jobs: {', '.join(job_killed_ids)}")
+            print(f"Successfully killed job(s): {', '.join(job_killed_ids)}")
             success = True
 
         if len(job_alive_ids) > 0:
-            print(f"Failed killing jobs: {', '.join(job_alive_ids)}")
+            print(f"Failed killing job(s): {', '.join(job_alive_ids)}")
             success = False
 
         if len(job_not_found_ids) > 0:
-            print(f"Failed finding jobs: {', '.join(job_not_found_ids)}")
+            print(f"Failed finding job(s): {', '.join(job_not_found_ids)}")
             success = False
 
 
