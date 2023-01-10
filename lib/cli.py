@@ -16,7 +16,7 @@ doc_short = \
 Usage:
   sprinkle start [--] [<args>...]
   sprinkle stop [<job_id>... | -a | --all]
-  sprinkle view [((output | log | error) <job_id>)]
+  sprinkle view [((output | log | error) [<job_id>])]
   sprinkle status
   sprinkle settings
   sprinkle export [<path>] [--] [<args>...]
@@ -43,7 +43,7 @@ Usage:
     Stop specific jobs or all jobs.
     If nothing specified, prompt to select job to kill.
 
-  sprinkle view [((output | log | error) <job_id>)]
+  sprinkle view [((output | log | error) [<job_id>])]
     View output, log, or errors of a specific job.
 
   sprinkle status
@@ -184,9 +184,8 @@ class Command:
 
 
     def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
-        # NOTE: Because of docpie, either both are none, or both are not none
-        if not type and not job_id:
-            # Prompt for type
+        # If no view type provided, prompt for type
+        if not type:
             types = ["Output", "Log", "Error"]
             type = prompt_choice(
                 "Choose view type", 
@@ -200,7 +199,8 @@ class Command:
             else:
                 type = types[int(type)]
 
-
+        # If no job ID provided, prompt for job ID
+        if not job_id:
             # Prompt for active job
             job_details = prompt_job_active()
 
@@ -213,6 +213,11 @@ class Command:
 
         # View job
         success = view_job(type, job_id)
+
+
+        # If not successful, inform
+        if not success:
+            print("Failed viewing job.\nPlease ensure the job exists or has existed\nand that you are in the correct directory for the selected job")
 
         # Return exit code
         return 0 if success else 1
