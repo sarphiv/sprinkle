@@ -98,6 +98,19 @@ class Command:
             return 1
 
 
+        # Check if environment file exists, inform and fail if not
+        working_directory_old = os.getcwd()
+        working_directory_new = settings.working_directory or working_directory_old
+
+        os.chdir(working_directory_new)
+        environment_exists = os.path.isfile(settings.environment_file)
+        os.chdir(working_directory_old)
+
+        if not environment_exists:
+            print(f'Environment file "{settings.environment_file}" does not exist in working directory "{working_directory_new}"')
+            return 1
+
+
         # Submit job script
         job_id = submit_job(settings, args)
 

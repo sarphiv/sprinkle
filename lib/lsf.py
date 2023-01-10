@@ -233,7 +233,8 @@ conda activate {settings.env_name}
 
 
 # Run job script and save output to file
-{settings.script} {" ".join(args)} > {sprinkle_project_output_dir}/%J-{settings.name}.txt
+# NOTE: %J is not available so using environment variable
+{settings.script} {" ".join(args)} > {sprinkle_project_output_dir}/$LSB_JOBID-{settings.name}.txt
 
 """
 +

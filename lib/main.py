@@ -83,6 +83,7 @@ except (KeyboardInterrupt, EOFError):
     #  sprinkle view [job id --(log | error | output)] (if none, prompt user)
 
     #TODO: Use environment.yaml instead for both sprinkle and jobs
+    #TODO: check for missing environment.yml or other location, before starting
 #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
 #TODO: Disclaimer on first run
 
