@@ -221,18 +221,15 @@ SPRINKLE_JOB_ENV_EXISTS=$?
 # If environment does not exist, create environment
 if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
     # Create environment
-    conda create -n {settings.env_name} --file {settings.env_spec} -y
-    
-    # Activate environment for script
-    conda activate {settings.env_name}
+    conda env create -n {settings.env_name} -f {settings.env_spec}
 # Else, environment exists, attempt installing packages in case there were changes
 else
     # Attempt installing (new) packages 
-    conda env update -n {settings.env_name} --file {settings.env_spec} --prune -y
-
-    # Activate environment for script
-    conda activate {settings.env_name}
+    conda env update -n {settings.env_name} -f {settings.env_spec} --prune
 fi
+
+# Activate environment for script
+conda activate {settings.env_name}
 
 
 # Run job script and save output to file
