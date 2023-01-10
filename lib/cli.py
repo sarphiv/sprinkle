@@ -100,7 +100,7 @@ class Command:
 
         # Check if environment file exists, inform and fail if not
         working_directory_old = os.getcwd()
-        working_directory_new = settings.working_directory or working_directory_old
+        working_directory_new = settings.working_dir or working_directory_old
 
         os.chdir(working_directory_new)
         environment_exists = os.path.isfile(settings.environment_file)
