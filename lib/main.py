@@ -85,7 +85,7 @@ except (KeyboardInterrupt, EOFError):
     #TODO: Use environment.yaml instead for both sprinkle and jobs
     #TODO: check for missing environment.yml or other location, before starting
     #TODO: Fix regex for reading active job time start and elapsed
-#TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
+    #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
 #TODO: Disclaimer on first run
 
     #TODO: Handle case where JobOptions changed between versions, and existing loads may not work

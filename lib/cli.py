@@ -219,7 +219,7 @@ class Command:
                 job.status, na(job.cpu_usage), na(job.mem_usage), na(job.mem_usage_avg), na(job.mem_usage_max), 
                 job.time_start, job.time_elapsed]
                 for job in jobs_active.values()],
-                headers=["Short name", "Job ID", "Queue", "Status", "CPU", "MEM", "MEM Avg.", "MEM Max.", "Started", "Finished"]
+                headers=["Short name", "Job ID", "Queue", "Status", "CPU", "MEM", "Avg.", "Max.", "Start", "Elapsed"]
             ))
 
             return 0
