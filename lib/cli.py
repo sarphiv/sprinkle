@@ -127,7 +127,8 @@ class Command:
         # WARN: Not handling case where jobs finish while executing this code
 
         # Get active jobs 
-        job_start_ids = set(get_jobs_active().keys())
+        job_active = get_jobs_active()
+        job_start_ids = set(job_active.keys())
         job_not_found_ids = set()
 
         # If all jobs should be killed, mark all for killing
@@ -135,7 +136,7 @@ class Command:
             job_kill_ids = job_start_ids
         # Else if no jobs provided, prompt for active jobs to kill, exit if none
         elif len(job_ids) == 0:
-            job_kill_ids = set(prompt_jobs_active(job_start_ids).keys())
+            job_kill_ids = set(prompt_jobs_active(job_active).keys())
             if len(job_kill_ids) == 0:
                 return 1
         # Else jobs provided, mark selected active jobs for killing
