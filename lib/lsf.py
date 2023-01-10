@@ -206,7 +206,7 @@ f"""
 source ~/.bashrc
 """
 +
-conditional_string(settings.working_dir is not None,
+conditional_string(settings.working_dir,
 f"""
 # Change working directory
 cd {settings.working_dir}
