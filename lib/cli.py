@@ -2,6 +2,8 @@ import os
 import traceback
 from typing import Union, Optional, Literal
 
+from tabulate import tabulate
+
 from constants import sprinkle_project_settings_export_file
 from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active
 from lsf_prompt import prompt_settings, prompt_jobs_active
@@ -197,8 +199,30 @@ class Command:
 
 
     def status() -> int:
-        print(get_jobs_active())
+        # Coalesce nothing
+        def na(value: str) -> str:
+            return value if value else "N/A"
+        
+        # Get active jobs
+        jobs_active = get_jobs_active()
 
+
+        # If no jobs, inform and exit failure
+        if len(jobs_active) == 0:
+            print("No active jobs to show")
+            
+            return 1
+        # Else, display jobs and exit success
+        else:        
+            print(tabulate(
+                [[job.name_short, job.job_id, job.queue, 
+                job.status, na(job.cpu_usage), na(job.mem_usage), na(job.mem_usage_avg), na(job.mem_usage_max), 
+                job.time_start, job.time_elapsed]
+                for job in jobs_active.values()],
+                headers=["Short name", "Job ID", "Queue", "Status", "CPU", "MEM", "MEM Avg.", "MEM Max.", "Started", "Finished"]
+            ))
+
+            return 0
 
  
     def settings() -> int:

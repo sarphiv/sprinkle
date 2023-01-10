@@ -1,12 +1,12 @@
-from enum import Enum
 from typing import Optional
 from dataclasses import dataclass, replace
 from itertools import islice
-from varname import nameof
 import pickle
 import os
 import subprocess
 import re
+
+from varname import nameof
 
 from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir
 
