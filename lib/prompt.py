@@ -1,10 +1,11 @@
 import os
-from typing import Optional, Union, Literal, Pattern
+from typing import Union, Literal, Pattern
 
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import Completer, FuzzyWordCompleter, PathCompleter, FuzzyCompleter
 from prompt_toolkit.validation import Validator, ThreadedValidator
 from tabulate import tabulate
+
 
 def prompt_base(info_text: str, value_validator: Validator = None, value_suggestion: str = "", value_suggestions: Union[list[str], Completer] = None) -> str:
     """Base prompt method for prompting user for input
@@ -83,6 +84,22 @@ def prompt_string(
     value_suggestion: str = "", 
     value_suggestions: Union[list[str], Completer] = None
 ) -> str:
+    """Prompts the user for a string input, and validates the input against a list of
+    allowed values, a list of disallowed values, a list of disallowed substrings. 
+    Also provides a suggestion and auto-completion via a list of suggestions.
+
+    Args:
+        info_text (str): String describing prompt
+        value_allowed (list[str], optional): Inputs that can be submitted. Defaults to None.
+        value_disallowed (list[str], optional): Inputs that may not be submitted. Defaults to None.
+        str_disallowed (list[str], optional): Substrings that the input may not contain. Defaults to None.
+        value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
+        value_suggestions (Union[list[str], Completer], optional): Suggestions for auto-completion engine. Defaults to None.
+
+    Returns:
+        str: User input that passes validation
+    """
+    # Callable that checks if input is valid
     def check_input(s: str):
         if value_allowed and s not in value_allowed:
             return False
@@ -105,6 +122,18 @@ def prompt_string(
 
 
 def prompt_regex(info_text: str, value_regex: Pattern, value_suggestion: str = "", value_suggestions: Union[list[str], Completer] = None) -> bool:
+    """Prompts the user for a string input, and validates the input against a compiled regex.
+    Also provides a suggestion and auto-completion via a list of suggestions.
+
+    Args:
+        info_text (str): String describing prompt
+        value_regex (Pattern): Compiled regex to validate input against
+        value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
+        value_suggestions (Union[list[str], Completer], optional): Suggestions for auto-completion engine. Defaults to None.
+
+    Returns:
+        str: User input that passes validation
+    """
     return prompt_base(
         info_text, 
         Validator.from_callable(lambda s: value_regex.search(s) is not None),
@@ -120,6 +149,20 @@ def prompt_range_integer(
     value_suggestion: int = None, 
     value_suggestions: list[Union[int, str]] = None
 ) -> int:
+    """Prompts the user for an integer, and validates the input against a range.
+    Also provides a suggestion and auto-completion via a list of suggestions.
+
+    Args:
+        info_text (str): String describing prompt
+        value_min (Union[int, float]): Minimum value (inclusive)
+        value_max (Union[int, float]): Maximum value (exclusive)
+        value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
+        value_suggestions (Union[list[str], Completer], optional): Suggestions for auto-completion engine. Defaults to None.
+
+    Returns:
+        str: User input that passes validation
+    """
+    # Check if input is an integer
     def check_int(s: str):
         if len(s) and s[0] in ('-', '+'):
             return s[1:].isdigit()
@@ -141,6 +184,14 @@ def prompt_boolean(
     value_false: list[str] = ["n", "no", "false", "0"], 
     value_suggestion: str = ""
 ) -> bool:
+    """Prompts the user for a boolean input, and validates the input against a list of boolean names.
+    
+    Args:
+        info_text (str): String describing prompt
+        value_true (list[str], optional): Inputs that represent True. Defaults to ["y", "yes", "true", "1"].
+        value_false (list[str], optional): Inputs that represent False. Defaults to ["n", "no", "false", "0"].
+        value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
+    """
     response = prompt_string(
         info_text, 
         value_true + value_false,
@@ -158,6 +209,17 @@ def prompt_path(
     value_allow_empty: bool = False,
     value_suggestion: str = None, 
 ) -> str:
+    """Prompts the user for a path, and validates the input against a list of boolean names.
+    
+    Args:
+        info_text (str): String describing prompt
+        path_type (Literal["file", "directory"], optional): Whether to prompt for a file or directory. Defaults to "file".
+        value_allow_empty (bool, optional): Whether to allow empty input. Defaults to False.
+        value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to None.
+
+    Returns:
+        str: User input that passes validation
+    """
     return prompt_base(
         info_text,
         Validator.from_callable(lambda s: (value_allow_empty and s == "") 
@@ -166,6 +228,7 @@ def prompt_path(
         FuzzyCompleter(PathCompleter(only_directories=path_type == "directory", expanduser=True), )
     )
 
+
 def prompt_choice(
     info_text: str, 
     choices: Union[list[str], list[list[str]], list[list[list[str]]]],
@@ -173,6 +236,18 @@ def prompt_choice(
     headers: list[str] = None,
     value_suggestion: str = ""
 ) -> str:
+    """Prompts the user for a choice, and validates the input against a list of choices.
+    
+    Args:
+        info_text (str): String describing prompt
+        choices (Union[list[str], list[list[str]], list[list[list[str]]]]): List of choices, or list of grouped choices, or list of grouped choices with values.
+        index (Union[list[str], list[list[str]]], optional): List of indexes or grouped indexes for choices. Defaults to None, which numerically 0-indexes the choices.
+        headers (list[str], optional): List of headers for choices and their values. Defaults to None.
+        value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
+
+    Returns:
+        str: User input that passes validation
+    """
     # Normalize choice to triple nested list form
     if isinstance(choices[0], str):
         choices = [[[choice] for choice in choices]]
@@ -191,18 +266,19 @@ def prompt_choice(
     elif isinstance(index[0], str):
         index = [index]
 
-
+    # Normalize headers to list form
     if headers is None:
         headers = []
 
 
+    # Get dimension of choice + values
     choices_inner_len = len(choices[0][0])
+    # Get width of separator for index
     index_width_max = max(len(idx) for index_group in index for idx in index_group)
 
-    choices_table = []
-    index_table = []
-    choices_values = []
-    index_values = []
+    # Build table data
+    choices_table, index_table = [], []
+    choices_values, index_values = [], []
     for choice_group, index_group in zip(choices, index):
         choices_table.extend(choice_group)
         index_table.extend(index_group)
@@ -212,25 +288,29 @@ def prompt_choice(
         choices_table.append([''] * choices_inner_len)
         index_table.append('-' * index_width_max)
 
-    
-    # Pop last redundant row
+
+    # Pop last redundant separator row
     choices_table.pop()
     index_table.pop()
 
-
+    # Create prompt text from table and info text
     prompt_text = f"{tabulate(choices_table, headers=headers, showindex=index_table)}\n\n{info_text}"
 
+    # Set allowed values to be either choice or index values
     value_allowed=choices_values + index_values
+    # Set suggestions to choices
     value_suggestions=choices_values
     
+    # Prompt user for input
     response = prompt_string(
         info_text=prompt_text,
         value_allowed=value_allowed,
         value_suggestion=value_suggestion,
         value_suggestions=value_suggestions
     )
-    
-    
+
+
+    # Return associated index value
     if response in index_values:
         return response
     else:
