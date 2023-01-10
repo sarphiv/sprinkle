@@ -223,7 +223,7 @@ def get_jobs_active() -> dict[str, JobDetails]:
     mem_max_attr = nameof(JobDetails.mem_usage_max)
     for line in islice(status_mem.stdout.splitlines(), 1, None):
         # Parse memory details
-        mem = re.findall(r"(\S+)\s+(?:\S+\s+){4}(\S+)\s+(\S+)\s+(\S+)\s+\S+\s+", line)
+        mem = re.findall(r"(\S+)\s+(?:\S+\s+){4}(\S+)\s+(\S+)\s+(\S+)\s+\S+", line)
         if len(mem) == 0:
             continue
         else:
