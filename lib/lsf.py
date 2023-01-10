@@ -163,7 +163,7 @@ def get_jobs_active() -> dict[str, JobDetails]:
         # For each line in status message, skip header, parse jobs
         for line in islice(status.stdout.splitlines(), 1, None):
             # Parse job details
-            details = re.findall(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\S ]+)\s+(\S+)", line)
+            details = re.findall(r"(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+([\S ]+)\s+(\S+)", line)[0]
             
             # Instantiate job details object
             job_details[details[0]] = JobDetails(
