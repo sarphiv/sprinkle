@@ -133,9 +133,11 @@ class Command:
         # If all jobs should be killed, mark all for killing
         if job_ids == "all":
             job_kill_ids = job_start_ids
-        # Else if no jobs provided, prompt for active jobs to kill
+        # Else if no jobs provided, prompt for active jobs to kill, exit if none
         elif len(job_ids) == 0:
             job_kill_ids = set(prompt_jobs_active(job_start_ids).keys())
+            if len(job_kill_ids) == 0:
+                return 1
         # Else jobs provided, mark selected active jobs for killing
         else:
             job_query_ids = set(job_ids)

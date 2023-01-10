@@ -264,21 +264,38 @@ def prompt_settings(settings_current: JobSettings) -> Optional[JobSettings]:
 
 
 
-def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> Optional[dict[str, JobDetails]]:
+def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, JobDetails]:
     if jobs_active is None:
         # Get active job details
         job_details = get_jobs_active()
     else:
         job_details = jobs_active
-    
-    # If no active jobs, return None
+
+    # If no active jobs, return nothing
     if len(job_details) == 0:
-        return None
+        return {}
 
 
-    # Prompt user for an active job
-    # TODO: Finish prompting for job
-    job_id = prompt_choice(job_details)
-    
-    # Return chosen job ID
-    return job_id
+    selected = [False] * len(job_details)
+
+    while True:
+        response = prompt_choice(
+            "Choose job(s)",
+            choices=[
+                [['true' if selected[i] else "false", job.name_short, job.job_id, job.queue, job.status, job.time_start, job.time_elapsed]
+                    for i, job in enumerate(job_details.values())], 
+                [["Finish"], ["Cancel"]]
+             ],
+            index=[list(range(len(selected))), ["f", "c"]],
+            headers=["Selected", "Short name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
+        )
+
+
+        if response == "f":
+            return {job.job_id: job for selected, job in zip(selected, job_details.values()) if selected}
+        elif response == "c":
+            return {}
+
+
+        selected[int(response)] = not selected[int(response)]
+

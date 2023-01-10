@@ -272,7 +272,7 @@ def prompt_choice(
 
 
     # Get dimension of choice + values
-    choices_inner_len = len(choices[0][0])
+    choices_inner_len_max = max(len(choice) for choice_group in choices for choice in choice_group)
     # Get width of separator for index
     index_width_max = max(len(idx) for index_group in index for idx in index_group)
 
@@ -285,7 +285,7 @@ def prompt_choice(
         choices_values.extend([choice[0] for choice in choice_group])
         index_values.extend(index_group)
 
-        choices_table.append([''] * choices_inner_len)
+        choices_table.append([''] * choices_inner_len_max)
         index_table.append('-' * index_width_max)
 
 
