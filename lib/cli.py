@@ -191,8 +191,7 @@ class Command:
             type = prompt_choice(
                 "Choose view type", 
                 choices=[types, ["Cancel"]],
-                index=[[str(i) for i in range(len(types))], ['c']],
-                value_suggestions=None
+                index=[[str(i) for i in range(len(types))], ['c']]
             )
             
             if type == 'c':

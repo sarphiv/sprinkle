@@ -302,7 +302,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
         return None
     # Else, return job details
     else:
-        job_details.values()[int(response)]
+        list(job_details.values())[int(response)]
 
 
 def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, JobDetails]:
