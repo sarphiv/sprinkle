@@ -195,9 +195,9 @@ def prompt_boolean(
     response = prompt_string(
         info_text,
         value_allowed=value_true + value_false,
-        value_suggestions=value_suggestion,
+        value_suggestion=value_suggestion,
         # Weave elements together [a, 1, b, 2] with length shortest list
-        value_suggestion=[elem for pair in zip(value_true, value_false) for elem in pair]
+        value_suggestions=[elem for pair in zip(value_true, value_false) for elem in pair]
     )
 
     return response in value_true

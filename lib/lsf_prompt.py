@@ -83,9 +83,7 @@ def prompt_new_boolean(attr: str, value_current: bool, value_default: bool) -> b
     name, formatter = job_settings_formatter[attr]
 
     return {attr: prompt_boolean(
-        f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-        value_true=["true"],
-        value_false=["false"]
+        f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: "
     )}
 
 
