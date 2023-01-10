@@ -17,7 +17,7 @@ class JobSettings:
     env_on_done_delete: bool            = False
 
     working_dir: str                    = ""
-    env_spec: str                       = "environment.yml"
+    env_file: str                       = "environment.yml"
     script: str                         = "python main.py"
 
     time_max: str                       = "24:00"
@@ -221,11 +221,11 @@ SPRINKLE_JOB_ENV_EXISTS=$?
 # If environment does not exist, create environment
 if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
     # Create environment
-    conda env create -n {settings.env_name} -f {settings.env_spec}
+    conda env create -n {settings.env_name} -f {settings.env_file}
 # Else, environment exists, attempt installing packages in case there were changes
 else
     # Attempt installing (new) packages 
-    conda env update -n {settings.env_name} -f {settings.env_spec} --prune
+    conda env update -n {settings.env_name} -f {settings.env_file} --prune
 fi
 
 # Activate environment for script

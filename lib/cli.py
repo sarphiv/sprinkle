@@ -103,11 +103,11 @@ class Command:
         working_directory_new = settings.working_dir or working_directory_old
 
         os.chdir(working_directory_new)
-        environment_exists = os.path.isfile(settings.environment_file)
+        environment_exists = os.path.isfile(settings.env_file)
         os.chdir(working_directory_old)
 
         if not environment_exists:
-            print(f'Environment file "{settings.environment_file}" does not exist in working directory "{working_directory_new}"')
+            print(f'Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
             return 1
 
 
