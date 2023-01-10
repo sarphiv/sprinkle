@@ -41,12 +41,12 @@ class JobDetails:
     job_id: str
     queue: str
     status: str
-    cpu_usage: Optional[str]
-    mem_usage: Optional[str]
-    mem_usage_avg: Optional[str]
-    mem_usage_max: Optional[str]
     time_start: str
     time_elapsed: str
+    cpu_usage: Optional[str] = None
+    mem_usage: Optional[str] = None
+    mem_usage_avg: Optional[str] = None
+    mem_usage_max: Optional[str] = None
 
 
 
