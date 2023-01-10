@@ -172,6 +172,8 @@ def get_jobs_active() -> dict[str, JobDetails]:
                 job_id=details[0],
                 queue=details[2],
                 status=details[5],
+                cpu_usage=None,
+                mem_usage=None,
                 time_start=details[6],
                 time_elapsed=details[7]
             )
