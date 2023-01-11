@@ -197,7 +197,7 @@ class Command:
                 print("No view type selected")
                 return 1
             else:
-                type = types[int(type)]
+                type = types[int(type)].lower()
 
         # If no job ID provided, prompt for job ID
         if not job_id:
