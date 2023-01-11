@@ -102,7 +102,7 @@ In a bunch of files in a hidden directory called `.sprinkle` in your project dir
 
 ## My script doesn't work on DTU's HPC cluster.
 Check the error, log, and output files with `sprinkle view error job_id`, 
-where `job_id` is the job ID of your failed job.
+where `job_id` is for your failed job.
 
 The error, log, and output files can also be found 
 in a hidden directory called `.sprinkle` in your project directory.
