@@ -120,3 +120,4 @@ In a hidden folder called `.sprinkle` in your project directory.
 
 ### How do I enable developer mode for sprinkle?
 Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`
+The next call to sprinkle will switch branches and recreate the environment.
