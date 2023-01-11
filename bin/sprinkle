@@ -4,148 +4,169 @@
 source ${HOME}/.bashrc
 
 
-# If sprinkle not installed, install sprinkle and quit
-if [[ ! -d ${HOME}/sprinkle ]]; then
-    echo -e "\n================== Installing sprinkle... =================="
-    git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
-    git -C ${HOME}/sprinkle checkout main
-
-    echo -e "==================   Installed sprinkle   ==================\n"
-
-
-    # If sprinkle is not in PATH, make sprinkle accessible
-    if [[ -z ${SPRINKLE_PATH_SET+x} ]]; then
-        echo -e "\n" >> ${HOME}/.profile
-        echo -e '# If not already added, add sprinkle to path' >> ${HOME}/.profile
-        echo -e 'if [[ -d ${HOME}/sprinkle/bin && -z ${SPRINKLE_PATH_SET+x} ]]; then' >> ${HOME}/.profile
-        echo -e '    PATH="${PATH:+${PATH}:}${HOME}/sprinkle/bin"' >> ${HOME}/.profile
-        echo -e '    export SPRINKLE_PATH_SET=' >> ${HOME}/.profile
-        echo -e "fi" >> ${HOME}/.profile
-
-        echo 'Added sprinkle to PATH. Please run "source ~/.profile" and then run "sprinkle".'
-        exit 0
-    fi
-fi
-
-
-
 # Define variables
-# NOTE: Defined down here because the above is hard-coded
+# WARN: There are hardcoded environment variable names and paths
+#  in the section that installs sprinkle. Update those too.
+# NOTE: Remember to update README.md when changing flags and locations.
 SPRINKLE_DIR=${HOME}/sprinkle
 SPRINKLE_ENV=sprinkle-env
+SPRINKLE_DEV=${SPRINKLE_DIR}/tmp/DEVELOPER-MODE
 SPRINKLE_CONDA_PACKAGES=${SPRINKLE_DIR}/environment.yml
 MINICONDA_INSTALLER=${SPRINKLE_DIR}/tmp/miniconda-installer.sh
+MINICONDA_DIR=${HOME}/miniconda
 FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
 
-# Check if an update is available
-git -C ${SPRINKLE_DIR} remote update &> /dev/null
-git -C ${SPRINKLE_DIR} status -uno | grep 'up to date' >> /dev/null
-UPDATE_AVAILABLE=$?
 
-# If update available
-if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
-    echo 'An update is available for sprinkle.'
-    select a in 'Perform update' 'Skip update' 'Exit'; do
-        case $a in
-            'Perform update' ) 
-            echo -e "\n================== Updating sprinkle... =================="
-            # Pull with fast-forward only
-            git -C ${SPRINKLE_DIR} pull --ff-only
-            
-            # Check if update succeded
-            UPDATE_SUCCESS=$?
+switch_branch ()
+{
+    if [[ -f ${SPRINKLE_DEV} ]]; then
+        git -C ${SPRINKLE_DIR} checkout dev &> /dev/null
+    else
+        git -C ${SPRINKLE_DIR} checkout main &> /dev/null
+    fi
+}
 
-            # If succeeded, mark conda sprinkle environment for recreation
-            if [[ ${UPDATE_SUCCESS} -eq 0 ]]; then
-                touch ${FLAG_RECREATE_CONDA_ENV}
 
-                echo -e "==================   Updated sprinkle   ==================\n"
-            # Else, inform of failure
-            else
-                echo -e "==================    Update failure    ==================\n"
-            fi
+# If update requested, intercept request
+if [[ $1 = "update" ]] && [[ $# -eq 1 ]]; then
+    # If sprinkle not installed, install sprinkle and quit
+    if [[ ! -d ${SPRINKLE_DIR} ]]; then
+        echo -e "\n================== Installing sprinkle... =================="
+        git clone https://github.com/sarphiv/sprinkle.git ${HOME}/sprinkle
+        switch_branch
 
-            # Rerun sprinkle
-            # NOTE: Update menu is shown again if update failed.
-            exec sprinkle
-            ;;
+        echo -e "==================   Installed sprinkle   ==================\n"
 
-            'Skip update' ) 
-            break
-            ;;
 
-            'Exit' )
+        # If sprinkle is not in PATH, make sprinkle accessible
+        # NOTE: Hardcoded environment variable names and paths
+        if [[ -z ${SPRINKLE_PATH_SET+x} ]]; then
+            echo -e "\n" >> ${HOME}/.profile
+            echo -e '# If not already added, add sprinkle to path' >> ${HOME}/.profile
+            echo -e 'if [[ -d ${HOME}/sprinkle/bin && -z ${SPRINKLE_PATH_SET+x} ]]; then' >> ${HOME}/.profile
+            echo -e '    PATH="${PATH:+${PATH}:}${HOME}/sprinkle/bin"' >> ${HOME}/.profile
+            echo -e '    export SPRINKLE_PATH_SET=' >> ${HOME}/.profile
+            echo -e "fi" >> ${HOME}/.profile
+
+            echo 'Added sprinkle to PATH. Please run "source ~/.profile" and then run "sprinkle".'
             exit 0
-            ;;
-        esac
-    done
-fi
-
-
-
-# If miniconda not installed, install and setup
-if [[ ! -d "${HOME}/miniconda" ]]; then
-    echo -e "\n================== Installing miniconda... =================="
-
-    # Download installer
-    wget -O ${MINICONDA_INSTALLER} 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
-    # Execute installer
-    chmod u+x ${MINICONDA_INSTALLER}
-    ${MINICONDA_INSTALLER} -f -b -p ${HOME}/miniconda
-    # Clean up installer
-    rm -f ${MINICONDA_INSTALLER}
-
-    # Integrate and setup miniconda
-    eval "$($HOME/miniconda/bin/conda shell.bash hook)"
-    source ${HOME}/.bashrc
-    conda init
-    conda config --set auto_activate_base false
-    source ${HOME}/.bashrc
-
-    echo -e "==================   Installed miniconda   ==================\n"
-fi
-
-
-
-# If sprinkle environment should be recreated, delete environment
-if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
-    echo -e '\n================== Deleting sprinkle environment... =================='
-    # Check if sprinkle environment is active
-    conda env list | grep "^${SPRINKLE_ENV}.*\*" >> /dev/null
-    SPRINKLE_ENV_ACTIVE=$?
-
-    # If sprinkle environment is active, deactivate it
-    if [[ ${SPRINKLE_ENV_ACTIVE} -eq 0 ]]; then
-        conda deactivate
+        fi
+    # Else, ensure correct branch is used for the following
+    else
+        switch_branch
     fi
 
-    # Remove environment
-    conda env remove -n ${SPRINKLE_ENV} -y
 
-    # Clear flag for recreation
-    rm -f ${FLAG_RECREATE_CONDA_ENV} >> /dev/null
-    echo -e "==================   Deleted sprinkle environment   ==================\n"
+
+    # Check if an update is available
+    git -C ${SPRINKLE_DIR} remote update &> /dev/null
+    git -C ${SPRINKLE_DIR} status -uno | grep 'up to date' >> /dev/null
+    UPDATE_AVAILABLE=$?
+
+    # If update available
+    if [[ ${UPDATE_AVAILABLE} -ne 0 ]]; then
+        echo 'An update is available for sprinkle.'
+        
+        echo -e "\n================== Updating sprinkle... =================="
+        # Pull with fast-forward only
+        git -C ${SPRINKLE_DIR} pull --ff-only
+        
+        # Check if update succeded
+        UPDATE_SUCCESS=$?
+
+        # If succeeded, mark environment for recration and rerun update
+        if [[ ${UPDATE_SUCCESS} -eq 0 ]]; then
+            # Mark conda sprinkle environment for recreation
+            touch ${FLAG_RECREATE_CONDA_ENV}
+
+            # Inform of success
+            echo -e "==================   Updated sprinkle   ==================\n"
+
+            # Rerun sprinkle update process in case updater was updated
+            exec sprinkle update
+        # Else, inform of failure and exit
+        else
+            # Inform of failure
+            echo -e "==================    Update failure    ==================\n"
+
+            # Exit with failure
+            exit 1
+        fi
+    fi
+
+
+
+    # If miniconda not installed, install and setup
+    if [[ ! -d $MINICONDA_DIR ]]; then
+        echo -e "\n================== Installing miniconda... =================="
+
+        # Download installer
+        wget -O ${MINICONDA_INSTALLER} 'https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
+        # Execute installer
+        chmod u+x ${MINICONDA_INSTALLER}
+        ${MINICONDA_INSTALLER} -f -b -p ${MINICONDA_DIR}
+        # Clean up installer
+        rm -f ${MINICONDA_INSTALLER}
+
+        # Integrate and setup miniconda
+        eval "$($MINICONDA_DIR/bin/conda shell.bash hook)"
+        source ${HOME}/.bashrc
+        conda init
+        conda config --set auto_activate_base false
+        source ${HOME}/.bashrc
+
+        echo -e "==================   Installed miniconda   ==================\n"
+    fi
+
+
+
+    # If sprinkle environment should be recreated, delete environment
+    if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
+        echo -e '\n================== Deleting sprinkle environment... =================='
+        # Check if sprinkle environment is active
+        conda env list | grep "^${SPRINKLE_ENV}.*\*" >> /dev/null
+        SPRINKLE_ENV_ACTIVE=$?
+
+        # If sprinkle environment is active, deactivate it
+        if [[ ${SPRINKLE_ENV_ACTIVE} -eq 0 ]]; then
+            conda deactivate
+        fi
+
+        # Remove environment
+        conda env remove -n ${SPRINKLE_ENV} -y
+
+        # Clear flag for recreation
+        rm -f ${FLAG_RECREATE_CONDA_ENV} >> /dev/null
+        echo -e "==================   Deleted sprinkle environment   ==================\n"
+    fi
+
+
+    # Check if sprinkle environment exiss
+    conda env list | grep "^${SPRINKLE_ENV}" >> /dev/null
+    SPRINKLE_ENV_EXISTS=$?
+
+    # If sprinkle environment does not exist or if it should be recreated, create environment
+    if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
+        echo -e "\n================== Creating sprinkle environment... =================="
+        conda env create -n ${SPRINKLE_ENV} -f ${SPRINKLE_CONDA_PACKAGES}
+
+        echo -e "==================   Created sprinkle environment   ==================\n"
+    fi
+
+
+    # Inform and exit with success
+    echo -e "Sprinkle is up to date.\n"
+
+    exit 0
+# Else, normal flow
+else
+    # Ensure correct branch is used
+    switch_branch
+
+    # Activate environment for script
+    conda activate ${SPRINKLE_ENV}
+
+    # Start sprinkle python script and pass arguments
+    exec python ${SPRINKLE_DIR}/lib/main.py "$@"
 fi
-
-
-# Check if sprinkle environment exiss
-conda env list | grep "^${SPRINKLE_ENV}" >> /dev/null
-SPRINKLE_ENV_EXISTS=$?
-
-# If sprinkle environment does not exist or if it should be recreated, create environment
-if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
-    echo -e "\n================== Creating sprinkle environment... =================="
-    conda env create -n ${SPRINKLE_ENV} -f ${SPRINKLE_CONDA_PACKAGES}
-
-    echo -e "==================   Created sprinkle environment   ==================\n"
-fi
-
-
-
-# Activate environment for script
-conda activate ${SPRINKLE_ENV}
-
-# Start sprinkle python script and pass arguments
-exec python ${SPRINKLE_DIR}/lib/main.py "$@"
-

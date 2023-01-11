@@ -20,6 +20,7 @@ Usage:
   sprinkle status
   sprinkle settings
   sprinkle export [<path>] [--] [<args>...]
+  sprinkle update
   sprinkle [help | -h | -? | --help]
 
 Options:
@@ -56,6 +57,10 @@ Usage:
     Export submission script to path. 
     If <args> contains dashes, add the two dashes "--" before <args>.
     Defaults to working directory.
+    
+  sprinkle update
+    Update sprinkle to latest version.
+    Also used for switching to developer mode (see README.md).
 
   sprinkle [help | -h | -? | --help]
     Show this screen.

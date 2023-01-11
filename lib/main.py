@@ -50,6 +50,9 @@ try:
             args["<args>"] if "<args>" in args else 
                 []
         )
+    elif "update" in args:
+        print("WARNING: This text should never appear. The update call should have been intercepted.")
+        exit_code = 1
     elif len(args) == 0 or len({"help", "--help", "-h", "-?"}.intersection(args)) > 0:
         exit_code = Command.help()
     else:
@@ -86,6 +89,10 @@ except (KeyboardInterrupt, EOFError):
     #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
 #TODO: Disclaimer on first run
 #TODO: Comments and docstrings
+    #TODO: Decouple most conda commands from usual flow (create sprinkle update)
+        # Remember to update readme.md
+        # remember to update both usage instructions
+    #TODO: Add dev flag to pull from dev instead
 #TODO: Change indexing of prompt choice to display start at 1, but still use 0 indexing internally
 
     #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
@@ -94,7 +101,6 @@ except (KeyboardInterrupt, EOFError):
 
     #TODO: Update readme.md when done, remember to remove WIP at top
 
-#TODO: Add dev flag to pull from dev instead
 
 
 

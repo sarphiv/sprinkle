@@ -8,7 +8,7 @@ Automatically sets up Miniconda, environments, submits jobs, manages jobs, and m
 On DTU's HPC cluster, simply run the following commands.
 
 ```bash
-wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle-installer && ./sprinkle-installer && rm -f sprinkle-installer && source ~/.profile && sprinkle
+wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle-installer && ./sprinkle-installer update && rm -f sprinkle-installer && source ~/.profile && sprinkle update && sprinkle help
 ```
 
 <details>
@@ -20,13 +20,15 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
   # Makes the script executable
   $ chmod u+x sprinkle-installer
   # Runs the installation script
-  $ ./sprinkle-installer
+  $ ./sprinkle-installer update
   # Delete downloaded sprinkle file
   $ rm -f sprinkle-installer
   # Update environment variables of current shell
   $ source ~/.profile
   # Run installed sprinkle for final setup
-  $ sprinkle
+  $ sprinkle update
+  # Display help view
+  $ sprinkle help
   ```
 </details>
 
@@ -111,3 +113,6 @@ It is much easier to find and fix issues there than on DTU's HPC cluster.
 
 ### Where are my script's output, log, and errors?
 In a hidden folder called `.sprinkle` in your project directory.
+
+### How do I enable developer mode for sprinkle?
+Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`
