@@ -61,32 +61,32 @@ should be created **before transfering your project to DTU's HPC cluster**.
   1. Run `conda create -n new_environment_name`
   0. Run `conda activate new_environment_name`
   0. Run `conda install <package_name1> <package_name2> ...`
-    - Example: `conda install python pip`
+      - Example: `conda install python pip`
   0. Run `pip install <package_name1> <package_name2> ...`
-    - Example: `pip install matplotlib numpy`
+      - Example: `pip install matplotlib numpy`
   0. Finally, run `conda env export > environment.yml`
 - Manually write the `environment.yml` file
   1. Create a new file called `environment.yml`
-    - Example: `touch environment.yml`
+      - Example: `touch environment.yml`
   0. Write your environment file
-    - Example:
-      ```yaml
-      name: new_environment_name
-      channels:
-        - defaults
-        - conda-forge
-        - pytorch
-      dependencies:
-        - python
-        - pip
-        - pytorch
-        - pytorch-cuda
-        - torchvision
-        - torchaudio
-        pip:
-          - tqdm
-          - opencv-python
-      ```
+      - Example:
+          ```yaml
+          name: new_environment_name
+          channels:
+            - defaults
+            - conda-forge
+            - pytorch
+          dependencies:
+            - python
+            - pip
+            - pytorch
+            - pytorch-cuda
+            - torchvision
+            - torchaudio
+            pip:
+              - tqdm
+              - opencv-python
+          ```
 
 Test your code with your new environment on your own computer first.
 It is much easier to find and fix issues there than on DTU's HPC cluster.
