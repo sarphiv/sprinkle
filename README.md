@@ -1,7 +1,16 @@
 # 🪄✨Sprinkle✨
 Sprinkle is used to simplify deployment of scripts to DTU's High Performance Computing Cluster. 
 
-Automatically sets up Miniconda, environments, submits jobs, manages jobs, and monitors jobs. 
+
+# ✅ Feature list
+- Automatic **Miniconda** installation
+- Automatic setup of environment
+- Job submission with arguments passed to job
+- Interactive stopping of jobs
+- View job output, log, and errors
+- View job status including **CPU and memory usage**
+- Change job settings
+- Export submission script to file
 
 
 # 🚀 Installation
@@ -41,17 +50,6 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 2. **On DTU's HPC cluster**
     1. Run `sprinkle start` in your project directory.
     0. Run `sprinkle help` to view other commands.
-
-
-# ✅ Feature list
-- Automatic Miniconda installation
-- Automatic setup of environment
-- Job submission with arguments passed to job
-- Interactive stopping of jobs
-- View job output, log, and errors
-- View job status including CPU and memory usage
-- Change job settings
-- Export submission script to file
 
 
 # 🗔 CLI
