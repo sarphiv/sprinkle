@@ -1,4 +1,4 @@
-# 🪄 sprinkle ✨
+# 🪄 ✨ Sprinkle ✨
 Sprinkle is used to simplify deployment of scripts to DTU's High Performance Computing Cluster. 
 
 Automatically sets up Miniconda, environments, submits jobs, manages jobs, and monitors jobs. 
@@ -97,8 +97,8 @@ Options:
 ```
 
 
-## Frequently asked questions
-### My single conda environment is a mess, I do not want to export it.
+# Frequently asked questions
+## My single conda environment is a mess, I do not want to export it.
 Then you need to make a new conda environment with `conda create -n new_environment_name`,
 install the necessary packages to make it work with your project, and then follow the original instructions.
 For the record, it is recommended to make an environment for each DTU course and/or project instead of a single environment.
@@ -109,21 +109,21 @@ You can use [sprinkle's environment file](https://github.com/sarphiv/sprinkle/bl
 Whatever you do, test your code with your new environment on your computer first.
 It is much easier to find and fix issues there than on DTU's HPC cluster.
 
-### How do I transfer my project to DTU's HPC cluster?
+## How do I transfer my project to DTU's HPC cluster?
 1. On your own computer, navigate a throough a terminal to the directory **CONTAINING** your project directory.
 0. Run `scp -r project_directory_on_your_computer s123456@student.dtu.dk@transfer.gbar.dtu.dk:where_you_want_it_on_DTU_HPC`
 0. Wait for the upload to finish
 
-### Where are my script's output, log, and errors?
+## Where are my script's output, log, and errors?
 In a hidden folder called `.sprinkle` in your project directory.
 
-### How do I enable developer mode for sprinkle?
+## How do I enable developer mode for sprinkle?
 Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
 The next call to sprinkle will switch branches and recreate the environment.
 Remove the file to leave developer mode upon the next call to sprinkle.
 
 
-## Disclaimer
+# Disclaimer
 This project is a personal project and therefore not affiliated with DTU. 
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
