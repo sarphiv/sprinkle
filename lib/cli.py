@@ -10,7 +10,7 @@ from lsf_prompt import prompt_settings, prompt_job_active, prompt_jobs_active
 from prompt import prompt_choice
 
 
-
+# NOTE: Remember to update both doc_short and doc_full
 doc_short = \
 """
 Usage:
@@ -28,6 +28,7 @@ Options:
   -a --all           Kill all jobs
 """
 
+# NOTE: Remember to update README.md
 doc_full = \
 """
 Sprinkle streamlines management of LSF jobs.
@@ -60,7 +61,6 @@ Usage:
     
   sprinkle update
     Update sprinkle to latest version.
-    Also used for switching to developer mode (see README.md FAQ).
 
   sprinkle [help | -h | -? | --help]
     Show this screen.
