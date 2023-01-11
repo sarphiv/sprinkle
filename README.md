@@ -54,7 +54,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 - Export submission script to file
 
 
-# 💻 CLI
+# 🗔 CLI
 ```
 Sprinkle streamlines management of LSF jobs.
 
