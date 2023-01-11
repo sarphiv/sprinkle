@@ -44,7 +44,6 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 
 # Feature list
-- Automatic update (asks for consent)
 - Automatic Miniconda installation
 - Automatic setup of environment
 - Job submission with arguments passed to job
