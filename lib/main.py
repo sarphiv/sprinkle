@@ -95,7 +95,7 @@ except (KeyboardInterrupt, EOFError):
 
 #TODO: Investigate whether to use conda update --phrune instead of fully recreating
 
-#TODO: Update readme.md when done, remember to remove WIP at top
+    #TODO: Update readme.md when done, remember to remove WIP at top
 
 #TODO: Add dev flag to pull from dev instead
 #TODO: Feature to scp back everything

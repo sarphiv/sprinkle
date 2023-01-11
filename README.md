@@ -1,9 +1,7 @@
-# WORK IN PROGRESS
-
 # sprinkle
-Shell script used to simplify deployment of python scripts to DTU's High Performance Computing Cluster. 
+Sprinkle is used to simplify deployment of scripts to DTU's High Performance Computing Cluster. 
 
-Automatically sets up miniconda, generates submission scripts with conda integration, submits jobs, and monitors jobs. 
+Automatically sets up Miniconda, environments, submits jobs, manages jobs, and monitors jobs. 
 
 
 # Installation
@@ -44,13 +42,15 @@ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/
 
 
 # Feature list
-- Semi-automatic update
-- Miniconda installation
-- Submission script generation
-- Job submission
-- Automatic job conda environment setup
-- Monitoring of recent output, errors, and program output
-- Killing of jobs
+- Automatic update (asks for consent)
+- Automatic Miniconda installation
+- Automatic setup of environment
+- Job submission with arguments passed to job
+- Interactive stopping of jobs
+- View job output, log, and errors
+- View job status including CPU and memory usage
+- Change job settings
+- Export submission script to file
 
 # CLI
 ```
@@ -68,7 +68,7 @@ Usage:
     Stop specific jobs or all jobs.
     If nothing specified, prompt to select job to kill.
 
-  sprinkle view [((output | log | error) <job_id>)]
+  sprinkle view [((output | log | error) [<job_id>])]
     View output, log, or errors of a specific job.
 
   sprinkle status
@@ -77,8 +77,9 @@ Usage:
   sprinkle settings
     Set up or change existing job settings.
 
-  sprinkle export [<path>]
+  sprinkle export [<path>] [<args>...]
     Export submission script to path. 
+    If <args> contains dashes, add the two dashes "--" before <args>.
     Defaults to working directory.
 
   sprinkle [help | -h | -? | --help]
