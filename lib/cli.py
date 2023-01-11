@@ -199,10 +199,19 @@ class Command:
             else:
                 type = types[int(type)].lower()
 
+
         # If no job ID provided, prompt for job ID
         if not job_id:
+            # Get active jobs
+            job_active = get_jobs_active()
+            
+            # If no active jobs, inform and exit failure
+            if len(job_active) == 0:
+                print("No active jobs to view")
+                return 1
+
             # Prompt for active job
-            job_details = prompt_job_active()
+            job_details = prompt_job_active(job_active)
 
             if job_details is None:
                 print("No job selected to view")
