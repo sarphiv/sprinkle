@@ -83,7 +83,7 @@ should be created **before transfering your project to DTU's HPC cluster**.
             - pytorch-cuda
             - torchvision
             - torchaudio
-            pip:
+            - pip:
               - tqdm
               - opencv-python
           ```
