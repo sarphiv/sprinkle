@@ -38,9 +38,9 @@ def prompt_base(info_text: str, value_validator: Validator = None, value_suggest
                 break
 
             if value_suggestions_text == "":
-                value_suggestions_text = f'"{value}"'
+                value_suggestions_text = f"{value}"
             else:
-                value_suggestions_text = f'{value_suggestions_text}, "{value}"'
+                value_suggestions_text = f"{value_suggestions_text}, {value}"
 
             value_suggestions_length += len(value)
 
@@ -54,7 +54,7 @@ def prompt_base(info_text: str, value_validator: Validator = None, value_suggest
 
     # Create prompt string
     n = '\n'
-    prompt_text = f"{info_text}{n}{f'Suggested values: [{value_suggestions_text}]{n}' if isinstance(value_suggestions, list) else ''}>>> "
+    prompt_text = f"{info_text}{n}{f'Suggested values: {value_suggestions_text}{n}' if isinstance(value_suggestions, list) else ''}>>> "
 
 
     # Prompt user
