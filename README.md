@@ -54,20 +54,47 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 # 📖 Frequently asked questions
 ## My single conda environment is a mess, I do not want to export it.
-Then you need to make a new conda environment with `conda create -n new_environment_name`,
-install the necessary packages to make it work with your project, and then follow the original instructions.
-For the record, it is recommended to make an environment for each DTU course and/or project instead of a single environment.
+There are multiple solutions. However, remember the `environment.yml` file 
+should be created **before transfering your project to DTU's HPC cluster**.
 
-An alternative is to manually write the `environment.yml` file (cleanest option).
-You can use [sprinkle's environment file](https://github.com/sarphiv/sprinkle/blob/main/environment.yml) for inspiration.
+- Create a new environment
+  1. Run `conda create -n new_environment_name`
+  0. Run `conda activate new_environment_name`
+  0. Run `conda install <package_name1> <package_name2> ...`
+    - Example: `conda install python pip`
+  0. Run `pip install <package_name1> <package_name2> ...`
+    - Example: `pip install matplotlib numpy`
+  0. Finally, run `conda env export > environment.yml`
+- Manually write the `environment.yml` file
+  1. Create a new file called `environment.yml`
+    - Example: `touch environment.yml`
+  0. Write your environment file
+    - Example:
+      ```yaml
+      name: new_environment_name
+      channels:
+        - defaults
+        - conda-forge
+        - pytorch
+      dependencies:
+        - python
+        - pip
+        - pytorch
+        - pytorch-cuda
+        - torchvision
+        - torchaudio
+        pip:
+          - tqdm
+          - opencv-python
+      ```
 
-Whatever you do, test your code with your new environment on your computer first.
+Test your code with your new environment on your own computer first.
 It is much easier to find and fix issues there than on DTU's HPC cluster.
 
 ## How do I transfer my project to DTU's HPC cluster?
 1. **On your own computer**, navigate a through a terminal to the directory **CONTAINING** your project directory.
-    1. Example: If your project is in `~/DTU/02456/project_directory`, navigate to `~/DTU/02456`.
-0. Run `scp -r project_directory s123456@student.dtu.dk@transfer.gbar.dtu.dk:project_directory`
+    - Example: If your project is in `~/DTU/02456/project_directory`, navigate to `~/DTU/02456`.
+0. Run `scp -r project_directory s123456@transfer.gbar.dtu.dk:project_directory`
 0. Wait for the upload to finish
 
 ## Where are my script's output, log, and errors?
