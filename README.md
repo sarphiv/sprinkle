@@ -1,10 +1,10 @@
-# 🪄 ✨ Sprinkle ✨
+# 🪄✨Sprinkle✨
 Sprinkle is used to simplify deployment of scripts to DTU's High Performance Computing Cluster. 
 
 Automatically sets up Miniconda, environments, submits jobs, manages jobs, and monitors jobs. 
 
 
-# Installation
+# 🚀 Installation
 On DTU's HPC cluster, simply run the following commands.
 
 ```bash
@@ -33,7 +33,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 </details>
 
 
-# Usage
+# 👉 Usage
 1. **On your local machine**
     1. Activate your project's environment with `conda activate <environment name>`.
     0. In your project directory, export your packages with `conda env export > environment.yml`.
@@ -43,7 +43,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
     0. Run `sprinkle help` to view other commands.
 
 
-# Feature list
+# ✅ Feature list
 - Automatic Miniconda installation
 - Automatic setup of environment
 - Job submission with arguments passed to job
@@ -54,7 +54,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 - Export submission script to file
 
 
-# CLI
+# 💻 CLI
 ```
 Sprinkle streamlines management of LSF jobs.
 
@@ -97,7 +97,7 @@ Options:
 ```
 
 
-# Frequently asked questions
+# 📖 Frequently asked questions
 ## My single conda environment is a mess, I do not want to export it.
 Then you need to make a new conda environment with `conda create -n new_environment_name`,
 install the necessary packages to make it work with your project, and then follow the original instructions.
@@ -123,7 +123,7 @@ The next call to sprinkle will switch branches and recreate the environment.
 Remove the file to leave developer mode upon the next call to sprinkle.
 
 
-# Disclaimer
+# 🧑‍⚖️ Disclaimer
 This project is a personal project and therefore not affiliated with DTU. 
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
