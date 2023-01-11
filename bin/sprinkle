@@ -20,7 +20,6 @@ FLAG_RECREATE_CONDA_ENV=${SPRINKLE_DIR}/tmp/RECREATE-CONDA-ENVIRONMENT
 
 switch_branch ()
 {
-    # WARN: Environment is not recreated 
     if [[ -f ${SPRINKLE_DEV} ]]; then
         git -C ${SPRINKLE_DIR} checkout dev 2>&1 | grep "Switched to branch 'dev'" >> /dev/null
         BRANCH_SWITCHED=$?
@@ -31,6 +30,7 @@ switch_branch ()
 
 
     # If branch switched, mark environment for recreation
+    echo ${BRANCH_SWITCHED}
     if [[ ${BRANCH_SWITCHED} -eq 0 ]]; then
         touch ${FLAG_RECREATE_CONDA_ENV}
     fi
