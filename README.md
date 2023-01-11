@@ -8,7 +8,7 @@ Automatically sets up Miniconda, environments, submits jobs, manages jobs, and m
 On DTU's HPC cluster, simply run the following commands.
 
 ```bash
-wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle && ./sprinkle && rm -f sprinkle && source ~/.profile && sprinkle
+wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle' && chmod u+x sprinkle-installer && ./sprinkle-installer && rm -f sprinkle-installer && source ~/.profile && sprinkle
 ```
 
 <details>
@@ -16,13 +16,13 @@ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/
 
   ```bash
   # Downloads newest version of sprinkle
-  $ wget -O 'sprinkle' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle'
+  $ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle/main/bin/sprinkle'
   # Makes the script executable
-  $ chmod u+x sprinkle
+  $ chmod u+x sprinkle-installer
   # Runs the installation script
-  $ ./sprinkle
+  $ ./sprinkle-installer
   # Delete downloaded sprinkle file
-  $ rm -f sprinkle
+  $ rm -f sprinkle-installer
   # Update environment variables of current shell
   $ source ~/.profile
   # Run installed sprinkle for final setup
