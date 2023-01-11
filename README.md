@@ -57,7 +57,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 There are multiple solutions. However, remember the `environment.yml` file 
 should be created **before transfering your project to DTU's HPC cluster**.
 
-- Create a new environment
+- __**Create a new environment**__
   1. Run `conda create -n new_environment_name`
   0. Run `conda activate new_environment_name`
   0. Run `conda install <package_name1> <package_name2> ...`
@@ -65,7 +65,7 @@ should be created **before transfering your project to DTU's HPC cluster**.
   0. Run `pip install <package_name1> <package_name2> ...`
       - Example: `pip install matplotlib numpy`
   0. Finally, run `conda env export > environment.yml`
-- Manually write the `environment.yml` file
+- __**Manually write the `environment.yml` file**__
   1. Create a new file called `environment.yml`
       - Example: `touch environment.yml`
   0. Write your environment file
@@ -106,6 +106,10 @@ where `job_id` is the job ID of your failed job.
 
 The error, log, and output files can also be found 
 in a hidden directory called `.sprinkle` in your project directory.
+
+## How do I connect to DTU's HPC cluster?
+Use `ssh` or `ThinLinc` to connect to DTU's HPC cluster.
+Contact [HPC support](https://www.hpc.dtu.dk/) for more information.
 
 ## How do I enable developer mode for sprinkle?
 Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
