@@ -24,7 +24,7 @@ switch_branch ()
     if [[ -f ${SPRINKLE_DEV} ]]; then
         git -C ${SPRINKLE_DIR} checkout dev 2>&1 | grep "Switched to branch 'dev'" >> /dev/null
     else
-        git -C ${SPRINKLE_DIR} checkout dev 2>&1 | grep "Switched to branch 'main'" >> /dev/null
+        git -C ${SPRINKLE_DIR} checkout main 2>&1 | grep "Switched to branch 'main'" >> /dev/null
     fi
 
 
@@ -34,6 +34,45 @@ switch_branch ()
         touch ${FLAG_RECREATE_CONDA_ENV}
     fi
 }
+
+
+
+update_environment ()
+{
+    # If sprinkle environment should be recreated, delete environment
+    if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
+        echo -e '\n================== Deleting sprinkle environment... =================='
+        # Check if sprinkle environment is active
+        conda env list | grep "^${SPRINKLE_ENV}.*\*" >> /dev/null
+        SPRINKLE_ENV_ACTIVE=$?
+
+        # If sprinkle environment is active, deactivate it
+        if [[ ${SPRINKLE_ENV_ACTIVE} -eq 0 ]]; then
+            conda deactivate
+        fi
+
+        # Remove environment
+        conda env remove -n ${SPRINKLE_ENV} -y
+
+        # Clear flag for recreation
+        rm -f ${FLAG_RECREATE_CONDA_ENV} >> /dev/null
+        echo -e "==================   Deleted sprinkle environment   ==================\n"
+    fi
+
+
+    # Check if sprinkle environment exiss
+    conda env list | grep "^${SPRINKLE_ENV}" >> /dev/null
+    SPRINKLE_ENV_EXISTS=$?
+
+    # If sprinkle environment does not exist or if it should be recreated, create environment
+    if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
+        echo -e "\n================== Creating sprinkle environment... =================="
+        conda env create -n ${SPRINKLE_ENV} -f ${SPRINKLE_CONDA_PACKAGES}
+
+        echo -e "==================   Created sprinkle environment   ==================\n"
+    fi
+}
+
 
 
 # If update requested, intercept request
@@ -128,39 +167,8 @@ if [[ $1 = "update" ]] && [[ $# -eq 1 ]]; then
     fi
 
 
-
-    # If sprinkle environment should be recreated, delete environment
-    if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
-        echo -e '\n================== Deleting sprinkle environment... =================='
-        # Check if sprinkle environment is active
-        conda env list | grep "^${SPRINKLE_ENV}.*\*" >> /dev/null
-        SPRINKLE_ENV_ACTIVE=$?
-
-        # If sprinkle environment is active, deactivate it
-        if [[ ${SPRINKLE_ENV_ACTIVE} -eq 0 ]]; then
-            conda deactivate
-        fi
-
-        # Remove environment
-        conda env remove -n ${SPRINKLE_ENV} -y
-
-        # Clear flag for recreation
-        rm -f ${FLAG_RECREATE_CONDA_ENV} >> /dev/null
-        echo -e "==================   Deleted sprinkle environment   ==================\n"
-    fi
-
-
-    # Check if sprinkle environment exiss
-    conda env list | grep "^${SPRINKLE_ENV}" >> /dev/null
-    SPRINKLE_ENV_EXISTS=$?
-
-    # If sprinkle environment does not exist or if it should be recreated, create environment
-    if [[ ${SPRINKLE_ENV_EXISTS} -ne 0 ]]; then
-        echo -e "\n================== Creating sprinkle environment... =================="
-        conda env create -n ${SPRINKLE_ENV} -f ${SPRINKLE_CONDA_PACKAGES}
-
-        echo -e "==================   Created sprinkle environment   ==================\n"
-    fi
+    # Ensure environment is up to date with branch
+    update_environment
 
 
     # Inform and exit with success
@@ -171,6 +179,12 @@ if [[ $1 = "update" ]] && [[ $# -eq 1 ]]; then
 else
     # Ensure correct branch is used
     switch_branch
+
+    # Ensure environment is up to date with branch
+    if [[ -f "${FLAG_RECREATE_CONDA_ENV}" ]]; then
+        update_environment
+    fi
+
 
     # Activate environment for script
     conda activate ${SPRINKLE_ENV}
