@@ -96,9 +96,13 @@ if [[ $1 = "update" ]] && [[ $# -eq 1 ]]; then
             echo -e '    export SPRINKLE_PATH_SET=' >> ${HOME}/.profile
             echo -e "fi" >> ${HOME}/.profile
 
-            echo 'Added sprinkle to PATH. Please run "source ~/.profile" and then run "sprinkle".'
-            exit 0
+            echo 'Added sprinkle to PATH. Please run "source ~/.profile" and then run "sprinkle update" to finish setup.'
+        else
+            echo 'Bootstrap setup finished. Please run "sprinkle update" to finish setup.'
         fi
+
+        # Exit with success
+        exit 0
     # Else, ensure correct branch is used for the following
     else
         switch_branch
