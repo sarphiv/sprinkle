@@ -93,7 +93,7 @@ Options:
 ```
 
 
-## FAQ
+## Frequently asked questions
 ### My conda environment is a mess, I do not want to export it.
 Then you need to make a new conda environment with `conda create -n new_environment_name`,
 install the necessary packages to make it work with your project, and then follow the original instructions.
