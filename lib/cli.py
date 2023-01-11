@@ -217,7 +217,7 @@ class Command:
 
         # If not successful, inform
         if not success:
-            print("Failed viewing job.\nPlease ensure the job exists or has existed\nand that you are in the correct directory for the selected job")
+            print("Failed viewing job.\nPlease ensure the job exists or has existed,\nand that you are in the correct directory for the selected job.")
 
         # Return exit code
         return 0 if success else 1

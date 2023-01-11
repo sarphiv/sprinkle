@@ -257,7 +257,7 @@ def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
             break
     
     # If file does not exist, return failure
-    if not os.path.isfile(file):
+    if not os.path.isfile(f"{directory}/{file}"):
         return False
 
 

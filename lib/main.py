@@ -38,7 +38,7 @@ try:
                 "log" if "log" in args else
                 "error" if "error" in args else 
                 None,
-            args["<job_id>"] if "<job_id>" in args else 
+            args["<job_id>"][0] if "<job_id>" in args else 
                 None
         )
     elif "status" in args:
