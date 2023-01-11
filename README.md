@@ -70,7 +70,7 @@ It is much easier to find and fix issues there than on DTU's HPC cluster.
 0. Wait for the upload to finish
 
 ## Where are my script's output, log, and errors?
-In a hidden folder called `.sprinkle` in your project directory.
+In a hidden folder called `.sprinkle` in your project's directory.
 
 ## How do I enable developer mode for sprinkle?
 Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
