@@ -93,7 +93,7 @@ except (KeyboardInterrupt, EOFError):
         # Remember to update readme.md
         # remember to update both usage instructions
     #TODO: Add dev flag to pull from dev instead
-#TODO: Change indexing of prompt choice to display start at 1, but still use 0 indexing internally
+    #TODO: Change indexing of prompt choice to display start at 1, but still use 0 indexing internally
 
     #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
     #TODO: Check if sprinkle project output directories exist before monitoring

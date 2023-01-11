@@ -148,7 +148,7 @@ def prompt_new_queue(attr: str, value_current: str, value_default: str) -> str:
         [queue_cpu, queue_gpu],
     )
     
-    queue_chosen = queue[int(response)]
+    queue_chosen = queue[int(response)-1]
 
 
     return {attr: queue_chosen, 
@@ -234,7 +234,7 @@ def prompt_settings(settings_current: JobSettings) -> Optional[JobSettings]:
         response_name = prompt_choice(
             "Choose setting to change",
             choices=[settings_name_formatted_value, [["Save"], ["Cancel"]]],
-            index=[[str(i) for i in range(len(settings_name_formatted_value))], ["s", "c"]],
+            index=[[str(i+1) for i in range(len(settings_name_formatted_value))], ["s", "c"]],
             headers=["Setting", "Value"]
         )
 
@@ -248,7 +248,7 @@ def prompt_settings(settings_current: JobSettings) -> Optional[JobSettings]:
         # Else, change setting and reprompt for additional changes
         else:
             # Convert name index to name
-            response_name = settings_names[int(response_name)]
+            response_name = settings_names[int(response_name)-1]
             # Convert name to attribute name
             attr = job_settings_name_to_attr[response_name]
 
@@ -292,7 +292,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
                 for job in job_details.values()], 
             [["Cancel"]]
         ],
-        index=[[str(i) for i in range(len(job_details))], ["c"]],
+        index=[[str(i+1) for i in range(len(job_details))], ["c"]],
         headers=["Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
         value_suggestions=None
     )
@@ -302,7 +302,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
         return None
     # Else, return job details
     else:
-        return list(job_details.values())[int(response)]
+        return list(job_details.values())[int(response)-1]
 
 
 def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, JobDetails]:
@@ -337,7 +337,7 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
                     for i, job in enumerate(job_details.values())], 
                 [['', "Finish"], ['', "Cancel"]]
              ],
-            index=[[str(i) for i in range(len(selected))], ["f", "c"]],
+            index=[[str(i+1) for i in range(len(selected))], ["f", "c"]],
             headers=["", "Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
             value_suggestions=None
         )
@@ -351,5 +351,5 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
             return {}
         # Else, toggle job selection
         else:
-            selected[int(response)] = not selected[int(response)]
+            selected[int(response)-1] = not selected[int(response)-1]
 

@@ -242,7 +242,7 @@ def prompt_choice(
     Args:
         info_text (str): String describing prompt
         choices (Union[list[str], list[list[str]], list[list[list[str]]]]): List of choices, or list of grouped choices, or list of grouped choices with values.
-        index (Union[list[str], list[list[str]]], optional): List of indexes or grouped indexes for choices. Defaults to None, which numerically 0-indexes the choices.
+        index (Union[list[str], list[list[str]]], optional): List of indexes or grouped indexes for choices. Defaults to None, which numerically 1-indexes the choices.
         headers (list[str], optional): List of headers for choices and their values. Defaults to None.
         value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
         value_suggestions (Union[list[str], Completer], optional): Suggestions for auto-completion engine. Defaults to first column.
@@ -262,7 +262,7 @@ def prompt_choice(
         i = 0
 
         for choice_group in choices:
-            index.append([str(i) for i in range(i, i + len(choice_group))])
+            index.append([str(i+1) for i in range(i, i + len(choice_group))])
             i += len(choice_group)
 
     elif isinstance(index[0], str):

@@ -215,14 +215,14 @@ class Command:
             type = prompt_choice(
                 "Choose view type", 
                 choices=[types, ["Cancel"]],
-                index=[[str(i) for i in range(len(types))], ['c']]
+                index=[[str(i+1) for i in range(len(types))], ['c']]
             )
             
             if type == 'c':
                 print("No view type selected")
                 return 1
             else:
-                type = types[int(type)].lower()
+                type = types[int(type)-1].lower()
 
 
 
