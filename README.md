@@ -52,6 +52,32 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
     0. Run `sprinkle help` to view other commands.
 
 
+# 📖 Frequently asked questions
+## My single conda environment is a mess, I do not want to export it.
+Then you need to make a new conda environment with `conda create -n new_environment_name`,
+install the necessary packages to make it work with your project, and then follow the original instructions.
+For the record, it is recommended to make an environment for each DTU course and/or project instead of a single environment.
+
+An alternative is to manually write the `environment.yml` file (cleanest option).
+You can use [sprinkle's environment file](https://github.com/sarphiv/sprinkle/blob/main/environment.yml) for inspiration.
+
+Whatever you do, test your code with your new environment on your computer first.
+It is much easier to find and fix issues there than on DTU's HPC cluster.
+
+## How do I transfer my project to DTU's HPC cluster?
+1. **On your own computer**, navigate a throough a terminal to the directory **CONTAINING** your project directory.
+0. Run `scp -r project_directory_on_your_computer s123456@student.dtu.dk@transfer.gbar.dtu.dk:where_you_want_it_on_DTU_HPC`
+0. Wait for the upload to finish
+
+## Where are my script's output, log, and errors?
+In a hidden folder called `.sprinkle` in your project directory.
+
+## How do I enable developer mode for sprinkle?
+Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
+The next call to sprinkle will switch branches and recreate the environment.
+Remove the file to leave developer mode upon the next call to sprinkle.
+
+
 # 🗔 CLI
 ```
 Sprinkle streamlines management of LSF jobs.
@@ -93,33 +119,6 @@ Options:
   -h -? --help       Show full help text.
   -a --all           Kill all jobs
 ```
-
-
-# 📖 Frequently asked questions
-## My single conda environment is a mess, I do not want to export it.
-Then you need to make a new conda environment with `conda create -n new_environment_name`,
-install the necessary packages to make it work with your project, and then follow the original instructions.
-For the record, it is recommended to make an environment for each DTU course and/or project instead of a single environment.
-
-An alternative is to manually write the `environment.yml` file (cleanest option).
-You can use [sprinkle's environment file](https://github.com/sarphiv/sprinkle/blob/main/environment.yml) for inspiration.
-
-Whatever you do, test your code with your new environment on your computer first.
-It is much easier to find and fix issues there than on DTU's HPC cluster.
-
-## How do I transfer my project to DTU's HPC cluster?
-1. On your own computer, navigate a throough a terminal to the directory **CONTAINING** your project directory.
-0. Run `scp -r project_directory_on_your_computer s123456@student.dtu.dk@transfer.gbar.dtu.dk:where_you_want_it_on_DTU_HPC`
-0. Wait for the upload to finish
-
-## Where are my script's output, log, and errors?
-In a hidden folder called `.sprinkle` in your project directory.
-
-## How do I enable developer mode for sprinkle?
-Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
-The next call to sprinkle will switch branches and recreate the environment.
-Remove the file to leave developer mode upon the next call to sprinkle.
-
 
 # 🧑‍⚖️ Disclaimer
 This project is a personal project and therefore not affiliated with DTU. 

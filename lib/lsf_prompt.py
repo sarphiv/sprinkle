@@ -64,14 +64,14 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
 
 
 # Prompting for job settings
-def prompt_new_string(allow_empty: bool = False) -> Callable[[str, str, str], str]:
+def prompt_new_string(allow_empty: bool = False, allow_spaces: bool = False) -> Callable[[str, str, str], str]:
     def prompt(attr: str, value_current: str, value_default: str) -> str:    
         name, formatter = job_settings_formatter[attr]
 
         return {attr: prompt_string(
             f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
             value_disallowed=None if allow_empty else [""],
-            str_disallowed=[" "],
+            str_disallowed=None if allow_spaces else [" "],
             value_suggestion=formatter(value_default) if allow_empty else None
         )}
 
@@ -163,7 +163,7 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = l
 
     f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
     f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=False),
-    f"{nameof(JobSettings.script)}": prompt_new_string(allow_empty=False),
+    f"{nameof(JobSettings.script)}": prompt_new_string(allow_empty=False, allow_spaces=True),
 
     f"{nameof(JobSettings.time_max)}": prompt_new_time,
     f"{nameof(JobSettings.queue)}": prompt_new_queue,
