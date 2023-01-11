@@ -67,40 +67,5 @@ except (KeyboardInterrupt, EOFError):
 
 
 
-#TODO: Ok, maybe MVP first instead...
-    #TODO: file for default bsub options, and base recommendations off of these
-    #TODO: Save bsub options in file and output status whether this file exists for the project yet (in current working directory)
-    #TODO: When trying to edit options again, display current settings instead of default recommendations
-    #TODO: running start, just submits based off of the options
-    #TODO: Allow users to also input arguments for their script target
-    #TODO: Ability to use sprinkle by e.g. 
-    #  sprinkle start [args...] (if no options for project, prompt user for first time project setup)
-    #  sprinkle stop [(job id [job_id ...]) | --all] (if none provided, prompt user, add option to kill all)
-    #  sprinkle status
-    #  sprinkle settings
-    #  sprinkle export [path]
-    #  sprinkle [help]
-
-    #  sprinkle view [job id --(log | error | output)] (if none, prompt user)
-
-    #TODO: Use environment.yaml instead for both sprinkle and jobs
-    #TODO: check for missing environment.yml or other location, before starting
-    #TODO: Fix regex for reading active job time start and elapsed
-    #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
-#TODO: Disclaimer on first run
 #TODO: Comments and docstrings
-    #TODO: Decouple most conda commands from usual flow (create sprinkle update)
-        # Remember to update readme.md
-        # remember to update both usage instructions
-    #TODO: Add dev flag to pull from dev instead
-    #TODO: Change indexing of prompt choice to display start at 1, but still use 0 indexing internally
-
-    #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
-    #TODO: Check if sprinkle project output directories exist before monitoring
 #TODO: Error if job submission failed
-
-    #TODO: Update readme.md when done, remember to remove WIP at top
-
-
-
-

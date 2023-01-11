@@ -1,4 +1,4 @@
-# sprinkle
+# 🪄 sprinkle ✨
 Sprinkle is used to simplify deployment of scripts to DTU's High Performance Computing Cluster. 
 
 Automatically sets up Miniconda, environments, submits jobs, manages jobs, and monitors jobs. 
@@ -86,7 +86,6 @@ Usage:
     
   sprinkle update
     Update sprinkle to latest version.
-    Also used for switching to developer mode (see README.md FAQ).
 
   sprinkle [help | -h | -? | --help]
     Show this screen.
@@ -119,5 +118,12 @@ It is much easier to find and fix issues there than on DTU's HPC cluster.
 In a hidden folder called `.sprinkle` in your project directory.
 
 ### How do I enable developer mode for sprinkle?
-Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`
+Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
 The next call to sprinkle will switch branches and recreate the environment.
+Remove the file to leave developer mode upon the next call to sprinkle.
+
+
+## Disclaimer
+This project is a personal project and therefore not affiliated with DTU. 
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
