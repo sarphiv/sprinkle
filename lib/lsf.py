@@ -11,6 +11,7 @@ from varname import nameof
 from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir
 
 
+
 @dataclass(frozen=True)
 class JobSettings:
     name: str                           = "default-job-name"
@@ -52,29 +53,60 @@ class JobDetails:
 
 
 def save_settings(settings: JobSettings) -> None:
+    """Save job settings to pickle file
+    
+    Args:
+        settings (JobSettings): Settings to save
+    """
+    
+    # If sprinkle directories do not exist for project, create them
     if not os.path.isdir(sprinkle_project_dir):
         os.makedirs(sprinkle_project_dir)
 
+    # Save settings to pickle file
     with open(f"{sprinkle_project_dir}/{sprinkle_project_settings_file}", "wb") as file:
         settings = pickle.dump(settings, file)
 
 
+
 def load_settings() -> Optional[JobSettings]:
+    """Load job settings from pickle file
+    
+    Returns:
+        Optional[JobSettings]: Job settings or None if settings file does not exist
+    """
+
+    # Construct path to settings file
     settings_file_path = f"{sprinkle_project_dir}/{sprinkle_project_settings_file}"
     
+    # If settings file does not exist, return None
     if not os.path.isfile(settings_file_path):
         return None
 
 
+    # Load settings from pickle file
     with open(settings_file_path, "rb") as file:
         settings = pickle.load(file)
 
+
+    # Return settings if version matches current software's settings version
     return settings if JobSettings.version == settings.version else None
 
 
 
-
 def submit_job(settings: JobSettings, args: list[str] = []) -> str:
+    """Submit a job to the cluster and return the job id
+    
+    Args:
+        settings (JobSettings): Settings for the job
+        args (list[str], optional): Arguments to pass to the job. Defaults to [].
+    
+    Returns:
+        str: Job id
+    """
+    
+    #TODO: Error if job submission failed
+    
     # If sprinkle directories do not exist for project, create them
     for dir in [sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir]:
         if not os.path.isdir(dir):
@@ -96,7 +128,17 @@ def submit_job(settings: JobSettings, args: list[str] = []) -> str:
     return job_id
 
 
+
 def kill_jobs(job_ids: list[str]) -> tuple[list[str], list[str]]:
+    """Kill jobs by job id
+    
+    Args:
+        job_ids (list[str]): List of job ids to kill
+    
+    Returns:
+        tuple[list[str], list[str]]: Tuple of (killed job ids, not killed job ids)
+    """
+    
     # If no jobs to kill, return nothing
     if len(job_ids) == 0:
         return [], []
@@ -142,6 +184,12 @@ def kill_jobs(job_ids: list[str]) -> tuple[list[str], list[str]]:
 
 
 def get_jobs_active() -> dict[str, JobDetails]:
+    """Get all active jobs
+    
+    Returns:
+        dict[str, JobDetails]: Dictionary of active jobs, where key is job id
+    """
+    
     # WARN: Race condition possible. Solving via ostrich algorithm.
 
     # Get job status
@@ -234,6 +282,15 @@ def get_jobs_active() -> dict[str, JobDetails]:
 
 
 def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
+    """View job output, log, or error
+
+    Args:
+        type (Literal["output", "log", "error"]): Type of file to view
+        job_id (str): Job ID
+
+    Returns:
+        bool: True if file exists and was successfully viewed, False otherwise
+    """
     # Get directory for file
     match type:
         case "output":
@@ -274,6 +331,15 @@ def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
 
 
 def generate_bsub_script(settings: JobSettings, args: list[str] = []) -> str: 
+    """Generates a bsub script for a job
+
+    Args:
+        settings (JobSettings): Settings for the job to be run
+        args (list[str], optional): Arguments to pass to the job.
+    
+    Returns:
+        str: Generated bsub script
+    """
     def conditional_string(condition, string, end="\n"):
         return string + end if condition else ""
 

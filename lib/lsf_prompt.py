@@ -305,6 +305,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
         return list(job_details.values())[int(response)-1]
 
 
+
 def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, JobDetails]:
     """Prompts user to select active jobs
     

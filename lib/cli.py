@@ -73,10 +73,13 @@ Options:
 
 
 
-# TODO: Add docstrings
-
 class Command:
     def _load_or_create_settings() -> Optional[JobSettings]:
+        """Load settings, or create new settings via prompt if none exist.
+        
+        Returns:
+            Optional[JobSettings]: Loaded or created settings.
+        """
         # Load settings
         settings = load_settings()
 
@@ -99,6 +102,14 @@ class Command:
 
 
     def start(args: list[str] = []) -> int:
+        """Start a new job, passing args to job script.
+        
+        Args:
+            args (list[str], optional): Arguments to pass to job script. Defaults to [].
+        
+        Returns:
+            int: 0 if successful, 1 if failure.
+        """
         # Load settings
         settings = Command._load_or_create_settings()
         # If no settings, return failure
@@ -132,6 +143,15 @@ class Command:
 
 
     def stop(job_ids: Union[Literal["all"], list[str]] = []) -> int:
+        """Stop jobs, either by ID or all jobs.
+        
+        Args:
+            job_ids (Union[Literal["all"], list[str]], optional): Job IDs to stop or the string all. Defaults to [].
+        
+        Returns:
+            int: 0 if successful, 1 if failure.
+        """
+        
         # WARN: Not handling case where jobs finish while executing this code
 
         # Get active jobs 
@@ -189,6 +209,16 @@ class Command:
 
 
     def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
+        """View output, log, or errors of a specific job.
+        
+        Args:
+            type (Optional[Literal["output", "log", "error"]], optional): Type of view. Defaults to None which prompts for a view.
+            job_id (Optional[str], optional): Job ID to view. Defaults to None which prompts for an active job.
+        
+        Returns:
+            int: 0 if successful, 1 if failure.
+        """
+
         # If no job ID provided, prompt for job ID
         if not job_id:
             # Get active jobs
@@ -240,6 +270,11 @@ class Command:
 
 
     def status() -> int:
+        """Display status of active jobs.
+        
+        Returns:
+            int: 0 if successful, 1 if failure.
+        """
         # Coalesce nothing
         def na(value: str) -> str:
             return value if value else "N/A"
@@ -267,6 +302,11 @@ class Command:
 
  
     def settings() -> int:
+        """Prompt user for job settings, and save settings.
+        
+        Returns:
+            int: 0 if settings changed, 1 if settings not changed.
+        """
         # Load settings
         settings = load_settings() or JobSettings()
         
@@ -284,6 +324,16 @@ class Command:
 
 
     def export(path: Optional[str], args: list[str] = []) -> int:
+        """Export a submission script to a file.
+        
+        Args:
+            path (Optional[str], optional): Path to save submission script to. Defaults to None which uses default path.
+            args (list[str], optional): Additional arguments to pass to submission script. Defaults to [].
+        
+        Returns:
+            int: 0 if successful, 1 if failure.
+        """
+
         # If no save path provided, use default path
         if not path:
             path = sprinkle_project_settings_export_file
@@ -326,6 +376,11 @@ class Command:
 
 
     def help() -> int:
+        """Display help documentation.
+        
+        Returns:
+            int: 0 meaning success. Always.
+        """
         print(doc_full)
 
         return 0
