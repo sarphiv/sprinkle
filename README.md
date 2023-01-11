@@ -55,6 +55,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 # 📖 Frequently asked questions
 <details>
   <summary><b>My single conda environment is a mess, I do not want to export it.</b></summary>
+
   There are multiple solutions. However, remember the `environment.yml` file 
   should be created **before transfering your project to DTU's HPC cluster**.
 
@@ -95,6 +96,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 <details>
   <summary><b>How do I transfer my project to DTU's HPC cluster?</b></summary>
+
   1. **On your own computer**, navigate through a terminal to the directory **CONTAINING** your project directory.
       - Example: If your project is in `~/DTU/12345/project_directory`, navigate to `~/DTU/012345`.
   0. Run `scp -r project_directory s123456@transfer.gbar.dtu.dk:project_directory`
@@ -103,11 +105,13 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 <details>
   <summary><b>Where are my script's output, log, and errors?</b></summary>
+
   In a bunch of files in a hidden directory called `.sprinkle` in your project directory.
 </details>
 
 <details>
   <summary><b>My script doesn't work on DTU's HPC cluster.</b></summary>
+
   Check the error, log, and output files with `sprinkle view error job_id`, 
   where `job_id` is for your failed job.
 
@@ -117,6 +121,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 <details>
   <summary><b>How do I connect to DTU's HPC cluster?</b></summary>
+
   Use `ssh s123456@login.hpc.dtu.dk` or `ThinLinc` to connect to DTU's HPC cluster.
   If you use `ssh` remember to run `linuxsh` to not overload the login node.
   Contact [HPC support](https://www.hpc.dtu.dk/) for more information and guidance.
@@ -124,6 +129,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 <details>
   <summary><b>How do I enable developer mode for sprinkle?</b></summary>
+
   Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
   The next call to sprinkle will switch branches and recreate the environment.
   Remove the file to leave developer mode upon the next call to sprinkle.
