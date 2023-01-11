@@ -90,7 +90,7 @@ except (KeyboardInterrupt, EOFError):
 #TODO: Change indexing of prompt choice to display start at 1, but still use 0 indexing internally
 
     #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
-#TODO: Check if sprinkle project output directories exist before monitoring
+    #TODO: Check if sprinkle project output directories exist before monitoring
 #TODO: Error if job submission failed
 
 #TODO: Investigate whether to use conda update --phrune instead of fully recreating

@@ -184,22 +184,6 @@ class Command:
 
 
     def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
-        # If no view type provided, prompt for type
-        if not type:
-            types = ["Output", "Log", "Error"]
-            type = prompt_choice(
-                "Choose view type", 
-                choices=[types, ["Cancel"]],
-                index=[[str(i) for i in range(len(types))], ['c']]
-            )
-            
-            if type == 'c':
-                print("No view type selected")
-                return 1
-            else:
-                type = types[int(type)].lower()
-
-
         # If no job ID provided, prompt for job ID
         if not job_id:
             # Get active jobs
@@ -218,7 +202,24 @@ class Command:
                 return 1
             else:
                 job_id = job_details.job_id
+
+
+        # If no view type provided, prompt for type
+        if not type:
+            types = ["Output", "Log", "Error"]
+            type = prompt_choice(
+                "Choose view type", 
+                choices=[types, ["Cancel"]],
+                index=[[str(i) for i in range(len(types))], ['c']]
+            )
             
+            if type == 'c':
+                print("No view type selected")
+                return 1
+            else:
+                type = types[int(type)].lower()
+
+
 
         # View job
         success = view_job(type, job_id)
