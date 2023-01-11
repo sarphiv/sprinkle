@@ -54,69 +54,86 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 # 📖 Frequently asked questions
 ## My single conda environment is a mess, I do not want to export it.
-There are multiple solutions. However, remember the `environment.yml` file 
-should be created **before transfering your project to DTU's HPC cluster**.
+<details>
+  <summary>Click to toggle</summary>
+  There are multiple solutions. However, remember the `environment.yml` file 
+  should be created **before transfering your project to DTU's HPC cluster**.
 
-- __**Create a new environment**__
-  1. Run `conda create -n new_environment_name`
-  0. Run `conda activate new_environment_name`
-  0. Run `conda install <package_name1> <package_name2> ...`
-      - Example: `conda install python pip`
-  0. Run `pip install <package_name1> <package_name2> ...`
-      - Example: `pip install matplotlib numpy`
-  0. Finally, run `conda env export > environment.yml`
-- __**Manually write the `environment.yml` file**__
-  1. Create a new file called `environment.yml`
-      - Example: `touch environment.yml`
-  0. Write your environment file
-      - Example:
-          ```yaml
-          name: new_environment_name
-          channels:
-            - defaults
-            - conda-forge
-            - pytorch
-          dependencies:
-            - python
-            - pip
-            - pytorch
-            - pytorch-cuda
-            - torchvision
-            - torchaudio
-            - pip:
-              - tqdm
-              - opencv-python
-          ```
+  - __**Create a new environment**__
+    1. Run `conda create -n new_environment_name`
+    0. Run `conda activate new_environment_name`
+    0. Run `conda install <package_name1> <package_name2> ...`
+        - Example: `conda install python pip`
+    0. Run `pip install <package_name1> <package_name2> ...`
+        - Example: `pip install matplotlib numpy`
+    0. Finally, run `conda env export > environment.yml`
+  - __**Manually write the `environment.yml` file**__
+    1. Create a new file called `environment.yml`
+        - Example: `touch environment.yml`
+    0. Write your environment file
+        - Example:
+            ```yaml
+            name: new_environment_name
+            channels:
+              - defaults
+              - conda-forge
+              - pytorch
+            dependencies:
+              - python
+              - pip
+              - pytorch
+              - pytorch-cuda
+              - torchvision
+              - torchaudio
+              - pip:
+                - tqdm
+                - opencv-python
+            ```
 
-Test your code with your new environment on your own computer first.
-It is much easier to find and fix issues there than on DTU's HPC cluster.
+  Test your code with your new environment on your own computer first.
+  It is much easier to find and fix issues there than on DTU's HPC cluster.
+</details>
 
 ## How do I transfer my project to DTU's HPC cluster?
-1. **On your own computer**, navigate through a terminal to the directory **CONTAINING** your project directory.
-    - Example: If your project is in `~/DTU/12345/project_directory`, navigate to `~/DTU/012345`.
-0. Run `scp -r project_directory s123456@transfer.gbar.dtu.dk:project_directory`
-0. Wait for the upload to finish
+<details>
+  <summary>Click to toggle</summary>
+  1. **On your own computer**, navigate through a terminal to the directory **CONTAINING** your project directory.
+      - Example: If your project is in `~/DTU/12345/project_directory`, navigate to `~/DTU/012345`.
+  0. Run `scp -r project_directory s123456@transfer.gbar.dtu.dk:project_directory`
+  0. Wait for the upload to finish
+</details>
 
 ## Where are my script's output, log, and errors?
-In a bunch of files in a hidden directory called `.sprinkle` in your project directory.
+<details>
+  <summary>Click to toggle</summary>
+  In a bunch of files in a hidden directory called `.sprinkle` in your project directory.
+</details>
 
 ## My script doesn't work on DTU's HPC cluster.
-Check the error, log, and output files with `sprinkle view error job_id`, 
-where `job_id` is for your failed job.
+<details>
+  <summary>Click to toggle</summary>
+  Check the error, log, and output files with `sprinkle view error job_id`, 
+  where `job_id` is for your failed job.
 
-The error, log, and output files can also be found 
-in a hidden directory called `.sprinkle` in your project directory.
+  The error, log, and output files can also be found 
+  in a hidden directory called `.sprinkle` in your project directory.
+</details>
 
 ## How do I connect to DTU's HPC cluster?
-Use `ssh s123456@login.hpc.dtu.dk` or `ThinLinc` to connect to DTU's HPC cluster.
-If you use `ssh` remember to run `linuxsh` to not overload the login node.
-Contact [HPC support](https://www.hpc.dtu.dk/) for more information and guidance.
+<details>
+  <summary>Click to toggle</summary>
+  Use `ssh s123456@login.hpc.dtu.dk` or `ThinLinc` to connect to DTU's HPC cluster.
+  If you use `ssh` remember to run `linuxsh` to not overload the login node.
+  Contact [HPC support](https://www.hpc.dtu.dk/) for more information and guidance.
+</details>
 
 ## How do I enable developer mode for sprinkle?
-Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
-The next call to sprinkle will switch branches and recreate the environment.
-Remove the file to leave developer mode upon the next call to sprinkle.
-
+<details>
+  <summary>Click to toggle</summary>
+  Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
+  The next call to sprinkle will switch branches and recreate the environment.
+  Remove the file to leave developer mode upon the next call to sprinkle.
+</details>
 
 # 🗔 CLI
 ```
