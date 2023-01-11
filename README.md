@@ -52,6 +52,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 - Change job settings
 - Export submission script to file
 
+
 # CLI
 ```
 Sprinkle streamlines management of LSF jobs.
@@ -90,3 +91,23 @@ Options:
   -h -? --help       Show full help text.
   -a --all           Kill all jobs
 ```
+
+
+## FAQ
+### My conda environment is a mess, I do not want to export it.
+Then you need to make a new conda environment with `conda create -n new_environment_name`,
+install the necessary packages to make it work with your project, and then follow the original instructions.
+
+An alternative is to manually write the `environment.yml` file (cleanest option).
+You can use [sprinkle's environment file](https://github.com/sarphiv/sprinkle/blob/main/environment.yml) for inspiration.
+
+Whatever you do, test your code with your new environment on your computer first.
+It is much easier to find and fix issues there than on DTU's HPC cluster.
+
+### How do I transfer my project to DTU's HPC cluster?
+1. On your own computer, navigate a throough a terminal to the directory **CONTAINING** your project directory.
+0. Run `scp -r project_directory_on_your_computer s123456@student.dtu.dk@transfer.gbar.dtu.dk:where_you_want_it_on_DTU_HPC`
+0. Wait for the upload to finish
+
+### Where are my script's output, log, and errors?
+In a hidden folder called `.sprinkle` in your project directory.

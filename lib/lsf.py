@@ -354,6 +354,7 @@ if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
     # Create environment
     conda env create -n {settings.env_name} -f {settings.env_file}
 # Else, environment exists, attempt installing packages in case there were changes
+# WARN: This does not prune pip packages
 else
     # Attempt installing (new) packages 
     conda env update -n {settings.env_name} -f {settings.env_file} --prune

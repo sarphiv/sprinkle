@@ -1,7 +1,5 @@
-import sys
-import inspect
-
 from docpie import docpie
+
 from cli import doc_short, Command
 
 
@@ -87,18 +85,16 @@ except (KeyboardInterrupt, EOFError):
     #TODO: Fix regex for reading active job time start and elapsed
     #TODO: Way to see core and memory efficiency when examining jobs, bstat -C and bstat -M
 #TODO: Disclaimer on first run
+#TODO: Comments and docstrings
 #TODO: Change indexing of prompt choice to display start at 1, but still use 0 indexing internally
 
     #TODO: Handle case where JobOptions changed between versions, and existing loads may not work
     #TODO: Check if sprinkle project output directories exist before monitoring
 #TODO: Error if job submission failed
 
-#TODO: Investigate whether to use conda update --phrune instead of fully recreating
-
     #TODO: Update readme.md when done, remember to remove WIP at top
 
 #TODO: Add dev flag to pull from dev instead
-#TODO: Feature to scp back everything
 
 
 
