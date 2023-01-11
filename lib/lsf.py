@@ -412,7 +412,7 @@ cd {settings.working_dir}
 +
 f"""
 # Check if job environment exists
-conda env list | grep "^${settings.env_name}" >> /dev/null
+conda env list | grep "^{settings.env_name}" >> /dev/null
 SPRINKLE_JOB_ENV_EXISTS=$?
 
 # If environment does not exist, create environment

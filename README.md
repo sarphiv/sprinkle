@@ -65,12 +65,13 @@ Whatever you do, test your code with your new environment on your computer first
 It is much easier to find and fix issues there than on DTU's HPC cluster.
 
 ## How do I transfer my project to DTU's HPC cluster?
-1. **On your own computer**, navigate a throough a terminal to the directory **CONTAINING** your project directory.
-0. Run `scp -r project_directory_on_your_computer s123456@student.dtu.dk@transfer.gbar.dtu.dk:where_you_want_it_on_DTU_HPC`
+1. **On your own computer**, navigate a through a terminal to the directory **CONTAINING** your project directory.
+    1. Example: If your project is in `~/DTU/02456/project_directory`, navigate to `~/DTU/02456`.
+0. Run `scp -r project_directory s123456@student.dtu.dk@transfer.gbar.dtu.dk:project_directory`
 0. Wait for the upload to finish
 
 ## Where are my script's output, log, and errors?
-In a hidden folder called `.sprinkle` in your project's directory.
+In a hidden folder called `.sprinkle` in your project directory.
 
 ## How do I enable developer mode for sprinkle?
 Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
