@@ -60,7 +60,7 @@ Usage:
     
   sprinkle update
     Update sprinkle to latest version.
-    Also used for switching to developer mode (see README.md).
+    Also used for switching to developer mode (see README.md FAQ).
 
   sprinkle [help | -h | -? | --help]
     Show this screen.

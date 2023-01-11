@@ -84,6 +84,10 @@ Usage:
     Export submission script to path. 
     If <args> contains dashes, add the two dashes "--" before <args>.
     Defaults to working directory.
+    
+  sprinkle update
+    Update sprinkle to latest version.
+    Also used for switching to developer mode (see README.md FAQ).
 
   sprinkle [help | -h | -? | --help]
     Show this screen.
@@ -96,9 +100,10 @@ Options:
 
 
 ## Frequently asked questions
-### My conda environment is a mess, I do not want to export it.
+### My single conda environment is a mess, I do not want to export it.
 Then you need to make a new conda environment with `conda create -n new_environment_name`,
 install the necessary packages to make it work with your project, and then follow the original instructions.
+For the record, it is recommended to make an environment for each DTU course and/or project instead of a single environment.
 
 An alternative is to manually write the `environment.yml` file (cleanest option).
 You can use [sprinkle's environment file](https://github.com/sarphiv/sprinkle/blob/main/environment.yml) for inspiration.
