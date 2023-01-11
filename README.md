@@ -108,8 +108,9 @@ The error, log, and output files can also be found
 in a hidden directory called `.sprinkle` in your project directory.
 
 ## How do I connect to DTU's HPC cluster?
-Use `ssh` or `ThinLinc` to connect to DTU's HPC cluster.
-Contact [HPC support](https://www.hpc.dtu.dk/) for more information.
+Use `ssh s123456@login.hpc.dtu.dk` or `ThinLinc` to connect to DTU's HPC cluster.
+If you use `ssh` remember to run `linuxsh` to not overload the login node.
+Contact [HPC support](https://www.hpc.dtu.dk/) for more information and guidance.
 
 ## How do I enable developer mode for sprinkle?
 Add a file called `DEVELOPER-MODE` to `~/sprinkle/tmp/`.
