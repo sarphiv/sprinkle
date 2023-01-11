@@ -23,14 +23,16 @@ switch_branch ()
     if [[ -f ${SPRINKLE_DEV} ]]; then
         git -C ${SPRINKLE_DIR} checkout dev 2>&1 | grep "Switched to branch 'dev'" >> /dev/null
         BRANCH_SWITCHED=$?
+        echo 'dev'
     else
         git -C ${SPRINKLE_DIR} checkout main 2>&1 | grep "Switched to branch 'main'" >> /dev/null
         BRANCH_SWITCHED=$?
+        echo 'main'
     fi
 
 
     # If branch switched, mark environment for recreation
-    echo ${BRANCH_SWITCHED}
+    echo "wut ${BRANCH_SWITCHED}"
     if [[ ${BRANCH_SWITCHED} -eq 0 ]]; then
         touch ${FLAG_RECREATE_CONDA_ENV}
     fi
