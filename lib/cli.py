@@ -55,7 +55,7 @@ Usage:
     Set up or change existing job settings.
 
   sprinkle export [<path>] [<args>...]
-    Export submission script to path. 
+    Export submission script to <path> that passes <args> to the job script.
     If <args> contains dashes, add the two dashes "--" before <args>.
     Defaults to working directory.
     
