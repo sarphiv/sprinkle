@@ -418,6 +418,9 @@ SPRINKLE_JOB_ENV_EXISTS=$?
 # If environment does not exist, create environment
 if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
     # Create environment
+    # WARN: Race condition. Two (or more) jobs may attempt to create the same new environment.
+    #  This causes all but one job to fail, because the others fail the conda commmand,
+    #  and then they continue on before the environment has been set up.
     conda env create -n {settings.env_name} -f {settings.env_file}
 # Else, environment exists, attempt installing packages in case there were changes
 # WARN: This does not prune pip packages
@@ -425,6 +428,13 @@ else
     # Attempt installing (new) packages 
     conda env update -n {settings.env_name} -f {settings.env_file} --prune
 fi
+
+# If failed environment setup, inform and exit
+if [[ $? -ne 0 ]]; then
+    echo "Failed to set up environment ({settings.env_name}) for job ($LSB_JOBID)" >&2
+    exit 1
+fi
+
 
 # Activate environment for script
 conda activate {settings.env_name}
