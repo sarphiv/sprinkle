@@ -262,7 +262,18 @@ class Command:
 
         # If not successful, inform
         if not success:
-            print("Failed viewing job.\nPlease ensure the job exists or has existed,\nand that you are in the correct directory for the selected job.")
+            print(
+                "Failed viewing job. This could be because of multiple reasons.\n" + 
+                "1. The job does not exist for this project directory.\n" +
+                "Please ensure you are in the correct project directory for the selected job.\n" + 
+                "2. The job may not yet have started as it is still setting up its environment.\n" +
+                "Please wait a minute and try again." +
+                (("\n" +
+                  "3. The job crashed, so it does not have any output.\n" + 
+                  "Try investigating by running: sprinkle view error <job_id>")
+                    if type == "output" 
+                    else "")
+            )
 
         # Return exit code
         return 0 if success else 1
