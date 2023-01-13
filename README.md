@@ -43,7 +43,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 
 # 👉 Usage
-All commands below should be ❗__run in your project directory__❗.
+All commands below should be ❗ **run in your project directory** ❗.
 
 1. **On your local machine**
     1. `conda activate <environment name>` _(activate your project's environment)_
