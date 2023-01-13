@@ -127,6 +127,26 @@ def prompt_new_file(allow_empty: bool = False) -> Callable[[str, str, str], str]
     return prompt
 
 
+def prompt_new_script(attr: str, value_current: str, value_default: str) -> str:
+    # Get display name and value formatter
+    name, formatter = job_settings_formatter[attr]
+    
+    # Prompt for value
+    value_new = prompt_string(
+        f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
+        value_suggestion=formatter(value_default)
+    )
+    
+    # If python script and missing python, prompt whether should add
+    if value_new.endswith(".py") and not value_new.startswith("python "):
+        if prompt_boolean("Python script detected without call to python.\n\n Prepend 'python ' to command (Recommended: Yes)?"):
+            value_new = "python " + value_new
+
+
+    # Return new attribute value pair
+    return {attr: value_new}
+
+
 def prompt_new_time(attr: str, value_current: str, value_default: str) -> str:
     name, formatter = job_settings_formatter[attr]
 
@@ -163,7 +183,7 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = l
 
     f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
     f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=False),
-    f"{nameof(JobSettings.script)}": prompt_new_string(allow_empty=False, allow_spaces=True),
+    f"{nameof(JobSettings.script)}": prompt_new_script,
 
     f"{nameof(JobSettings.time_max)}": prompt_new_time,
     f"{nameof(JobSettings.queue)}": prompt_new_queue,
