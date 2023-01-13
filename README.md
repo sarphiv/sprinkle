@@ -43,52 +43,53 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 
 # 👉 Usage
+All commands below should be __run in your project directory__.
+
 1. **On your local machine**
-    1. Activate your project's environment with `conda activate <environment name>`.
-    0. In your project directory, export your packages with `conda env export > environment.yml`.
-    0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
+    1. `conda activate <environment name>` (Activate your project's environment with)
+    0. `conda env export > environment.yml` (Or create the environment file manually - see FAQ below)
+    0. Transfer project directory to DTU's HPC cluster (see FAQ below if in doubt)
 2. **On DTU's HPC cluster**
-    1. Run `sprinkle start` in your project directory and follow the interactive guide.
-    0. Run `sprinkle help` to view other commands.
+    1. `sprinkle start` and then enter job parameters such as CPU cores, memory, time, and main script.
+    0. `sprinkle help` (View other commands)
 
 
 # 📖 Frequently asked questions
 <details>
-  <summary><b>My single conda environment is a mess, I do not want to export it.</b></summary>
+  <summary><b>How do I create the environment file?</b></summary>
 
-  There are multiple solutions. However, remember the `environment.yml` file 
+  There are multiple ways. However, remember the `environment.yml` file 
   should be created **before transfering your project to DTU's HPC cluster**.
 
-  - __**Create a new environment**__
-    1. Run `conda create -n new_environment_name`
-    0. Run `conda activate new_environment_name`
-    0. Run `conda install <package_name1> <package_name2> ...`
-        - Example: `conda install python pip`
-    0. Run `pip install <package_name1> <package_name2> ...`
-        - Example: `pip install matplotlib numpy`
-    0. Finally, run `conda env export > environment.yml`
-  - __**Manually write the `environment.yml` file**__
-    1. Create a new file called `environment.yml`
-        - Example: `touch environment.yml`
-    0. Write your environment file
-        - Example:
-            ```yaml
-            name: new_environment_name
-            channels:
-              - defaults
-              - conda-forge
-              - pytorch
-            dependencies:
-              - python
-              - pip
-              - pytorch
-              - pytorch-cuda
-              - torchvision
-              - torchaudio
-              - pip:
-                - tqdm
-                - opencv-python
-            ```
+  - Either __**create a new environment**__
+    ```bash
+    conda create -n new_environment_name
+    conda activate new_environment_name
+    conda install <package_name1> <package_name2> ...
+    pip install <package_name1> <package_name2> ...
+    conda env export > environment.yml
+    ```
+  - Or __**manually write the `environment.yml` file**__
+    1. Create a new file called `environment.yml` (can be done with `touch environment.yml`)
+    0. Write your environment file (example below, version numbers can be specified).
+      ```yaml
+      name: new_environment_name
+      channels:
+        - defaults
+        - conda-forge
+        - pytorch
+      dependencies:
+        - python
+        - pip
+        - pytorch
+        - pytorch-cuda
+        - torchvision
+        - torchaudio
+        - pip:
+          - scikit-learn
+          - opencv-python
+          - tqdm
+      ```
 
   Test your code with your new environment on your own computer first.
   It is much easier to find and fix issues there than on DTU's HPC cluster.
