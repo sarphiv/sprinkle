@@ -134,7 +134,6 @@ def prompt_new_script(attr: str, value_current: str, value_default: str) -> str:
     # Prompt for value
     value_new = prompt_string(
         f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-        value_suggestion=formatter(value_default)
     )
     
     # If python script and missing python, prompt whether should add
