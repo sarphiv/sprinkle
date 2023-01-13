@@ -43,15 +43,15 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 
 
 # 👉 Usage
-All commands below should be __run in your project directory__.
+All commands below should be ❗__run in your project directory__❗.
 
 1. **On your local machine**
-    1. `conda activate <environment name>` (Activate your project's environment with)
-    0. `conda env export > environment.yml` (Or create the environment file manually - see FAQ below)
-    0. Transfer project directory to DTU's HPC cluster (see FAQ below if in doubt)
+    1. `conda activate <environment name>` _(activate your project's environment)_
+    0. `conda env export > environment.yml` _(or create the environment file manually - see FAQ below)_
+    0. Transfer project directory to DTU's HPC cluster _(see FAQ below)_
 2. **On DTU's HPC cluster**
-    1. `sprinkle start` and then enter job parameters such as CPU cores, memory, time, and main script.
-    0. `sprinkle help` (View other commands)
+    1. `sprinkle start` and then enter job parameters _(such as CPU cores, memory, time, and main script)_
+    0. `sprinkle help` _(view other commands)_
 
 
 # 📖 Frequently asked questions
