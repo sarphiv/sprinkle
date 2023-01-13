@@ -102,6 +102,8 @@ All commands below should be ❗ **run in your project directory** ❗.
       - Example: If your project is in `~/DTU/12345/project_directory`, navigate to `~/DTU/012345`.
   0. Run `scp -r project_directory s123456@transfer.gbar.dtu.dk:project_directory`
   0. Wait for the upload to finish
+
+  If the above fails, contact [HPC support](https://www.hpc.dtu.dk/) for more information and guidance.
 </details>
 
 <details>
