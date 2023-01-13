@@ -138,7 +138,7 @@ def prompt_new_script(attr: str, value_current: str, value_default: str) -> str:
     
     # If python script and missing python, prompt whether should add
     if value_new.endswith(".py") and not value_new.startswith("python "):
-        if prompt_boolean("Python script detected without call to python.\n\n Prepend 'python ' to command (Recommended: Yes)?"):
+        if prompt_boolean("Python script detected without call to python.\n\nPrepend 'python ' to command (Recommended: yes)?"):
             value_new = "python " + value_new
 
 
@@ -314,7 +314,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
         index=[[str(i+1) for i in range(len(job_details))], ["c"]],
         headers=["Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
         # WARN: Low job ID's will clash with indexes. Assuming job ID's are above a thousand.
-        value_suggestions=[job.job_id for job in job_details.values()]
+        value_suggestions=[job.job_id for job in job_details.values()] + ["Finish", "Cancel"]
     )
 
     # If cancel, return nothing to mean no selection
@@ -361,7 +361,7 @@ def prompt_jobs_active(jobs_active: dict[str, JobDetails] = None) -> dict[str, J
             index=[[str(i+1) for i in range(len(selected))], ["f", "c"]],
             headers=["", "Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
             # WARN: Low job ID's will clash with indexes. Assuming job ID's are above a thousand.
-            value_suggestions=[job.job_id for job in job_details.values()]
+            value_suggestions=[job.job_id for job in job_details.values()] + ["Finish", "Cancel"]
         )
 
 
