@@ -72,24 +72,24 @@ All commands below should be ❗__run in your project directory__❗.
   - Or __**manually write the `environment.yml` file**__
     1. Create a new file called `environment.yml` (can be done with `touch environment.yml`)
     0. Write your environment file (example below, version numbers can be specified).
-      ```yaml
-      name: new_environment_name
-      channels:
-        - defaults
-        - conda-forge
-        - pytorch
-      dependencies:
-        - python
-        - pip
-        - pytorch
-        - pytorch-cuda
-        - torchvision
-        - torchaudio
-        - pip:
-          - scikit-learn
-          - opencv-python
-          - tqdm
-      ```
+        ```yaml
+        name: new_environment_name
+        channels:
+          - defaults
+          - conda-forge
+          - pytorch
+        dependencies:
+          - python
+          - pip
+          - pytorch
+          - pytorch-cuda
+          - torchvision
+          - torchaudio
+          - pip:
+            - scikit-learn
+            - opencv-python
+            - tqdm
+        ```
 
   Test your code with your new environment on your own computer first.
   It is much easier to find and fix issues there than on DTU's HPC cluster.
