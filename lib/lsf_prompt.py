@@ -314,7 +314,7 @@ def prompt_job_active(jobs_active: dict[str, JobDetails] = None) -> Optional[Job
         index=[[str(i+1) for i in range(len(job_details))], ["c"]],
         headers=["Name", "Job ID", "Queue", "Status", "Start", "Elapsed"],
         # WARN: Low job ID's will clash with indexes. Assuming job ID's are above a thousand.
-        value_suggestions=[job.job_id for job in job_details.values()] + ["Finish", "Cancel"]
+        value_suggestions=[job.job_id for job in job_details.values()] + ["Cancel"]
     )
 
     # If cancel, return nothing to mean no selection
