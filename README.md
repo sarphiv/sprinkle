@@ -48,7 +48,7 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
     0. In your project directory, export your packages with `conda env export > environment.yml`.
     0. Transfer project directory to DTU's HPC cluster with e.g. `scp` or `ThinLinc`. 
 2. **On DTU's HPC cluster**
-    1. Run `sprinkle start` in your project directory.
+    1. Run `sprinkle start` in your project directory and follow the interactive guide.
     0. Run `sprinkle help` to view other commands.
 
 

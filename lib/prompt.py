@@ -1,5 +1,5 @@
 import os
-from typing import Union, Literal, Pattern
+from typing import Union, Literal, Pattern, Optional
 
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import Completer, FuzzyWordCompleter, PathCompleter, FuzzyCompleter
@@ -235,7 +235,7 @@ def prompt_choice(
     index: Union[list[str], list[list[str]]] = None,
     headers: list[str] = None,
     value_suggestion: str = "",
-    value_suggestions: Union[Literal["first column"], list[str], Completer] = "first column"
+    value_suggestions: Optional[Union[int, list[str], Completer]] = 0
 ) -> str:
     """Prompts the user for a choice, and validates the input against a list of choices.
     
@@ -245,7 +245,7 @@ def prompt_choice(
         index (Union[list[str], list[list[str]]], optional): List of indexes or grouped indexes for choices. Defaults to None, which numerically 1-indexes the choices.
         headers (list[str], optional): List of headers for choices and their values. Defaults to None.
         value_suggestion (str, optional): Suggestion to display when no input provided. Defaults to "".
-        value_suggestions (Union[list[str], Completer], optional): Suggestions for auto-completion engine. Defaults to first column.
+        value_suggestions (Optional[int,  list[str], Completer]], optional): Suggestions for auto-completion engine. Defaults to first column (index 0).
 
     Returns:
         str: User input that passes validation
@@ -272,6 +272,9 @@ def prompt_choice(
     if headers is None:
         headers = []
 
+    # Check if value suggestions is a column
+    value_suggestion_is_column = isinstance(value_suggestions, int)
+
 
     # Get dimension of choice + values
     choices_inner_len_max = max(len(choice) for choice_group in choices for choice in choice_group)
@@ -284,7 +287,9 @@ def prompt_choice(
     for choice_group, index_group in zip(choices, index):
         choices_table.extend(choice_group)
         index_table.extend(index_group)
-        choices_values.extend([choice[0] for choice in choice_group])
+
+        choices_values.extend([choice[value_suggestions if value_suggestion_is_column else 0] 
+                               for choice in choice_group])
         index_values.extend(index_group)
 
         choices_table.append([''] * choices_inner_len_max)
@@ -299,11 +304,24 @@ def prompt_choice(
     prompt_text = f"{tabulate(choices_table, headers=headers, showindex=index_table)}\n\n{info_text}"
 
 
-    if value_suggestions == "first column":
+    # If value suggestions is a column, set suggestions to be choice column and allow them
+    if value_suggestion_is_column:
+        # Ensure matching length
+        if len(choices_values) != len(index_values):
+            raise ValueError(f"{len(choices_values)=} (choice column length) must be same length as {len(index_values)=} (index length)")
+        
         # Set allowed values to be either choice or index values
         value_allowed = choices_values + index_values
         # Set suggestions
         value_suggestions = choices_values
+    # Else if value suggestions is a list, allow the suggestions
+    elif isinstance(value_suggestions, list):
+        # Ensure matching length
+        if len(value_suggestions) != len(index_values):
+            raise ValueError(f"{len(value_suggestions)=} (value suggestions length) must be same length as {len(index_values)=} (index legnth)")
+        
+        # Set allowed values to be either suggestions or index values
+        value_allowed = value_suggestions + index_values
     else:    
         # Set allowed values to be index values only
         value_allowed = index_values
