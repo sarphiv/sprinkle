@@ -154,7 +154,7 @@ class Command:
         os.chdir(working_directory_old)
 
         if not environment_exists:
-            print(f'Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
+            print(f'ERROR: Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
             return 1
 
 

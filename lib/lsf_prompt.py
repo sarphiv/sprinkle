@@ -38,9 +38,9 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
     f"{nameof(JobSettings.working_dir)}": 
         ("Working directory", empty_coalesce(getcwd())),
     f"{nameof(JobSettings.env_file)}": 
-        ("Environment file", empty_coalesce("[Auto-generated ONCE on first run]")),
+        ("Environment file", empty_coalesce("[Auto-generated ONCE]")),
     f"{nameof(JobSettings.req_file)}": 
-        ("Requirements file", empty_coalesce("[Auto-generated ONCE on first run]")),
+        ("Requirements file", empty_coalesce("[Auto-generated ONCE]")),
     f"{nameof(JobSettings.script)}": 
         ("Script (or command)", as_is),
 
@@ -117,13 +117,19 @@ def prompt_new_directory(allow_empty: bool = False) -> Callable[[str, str, str],
 def prompt_new_file(allow_empty: bool = False) -> Callable[[str, str, str], str]:
     def prompt(attr: str, value_current: str, value_default: str) -> str:
         name, formatter = job_settings_formatter[attr]
-
-        return {attr: prompt_path(
+        
+        path = prompt_path(
             f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
             path_type="file",
             value_allow_empty=allow_empty,
             value_suggestion=formatter(value_default) if allow_empty else None
-        )}
+        )
+
+        if allow_empty and path == formatter(value_default):
+            path = ""
+
+
+        return {attr: path}
 
 
     return prompt
