@@ -41,7 +41,7 @@ try:
                 None,
             args["<job_id>"][0] if "<job_id>" in args else 
                 None,
-            args["-a"] in args
+            "-a" in args
         )
 
     elif "status" in args:
