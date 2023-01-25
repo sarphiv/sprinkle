@@ -422,11 +422,11 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
 
     if generate_env_file:
         generate_environment_yml(settings.env_name, env_file_name, req_file_name)
-        settings = replace(settings, {nameof(JobSettings.env_file): env_file_name})
+        settings = replace(settings, **{nameof(JobSettings.env_file): env_file_name})
 
     if generate_req_file:
         generate_requirements_txt(req_file_name)
-        settings = replace(settings, {nameof(JobSettings.req_file): req_file_name})
+        settings = replace(settings, **{nameof(JobSettings.req_file): req_file_name})
 
     
     # Return changed settings    
