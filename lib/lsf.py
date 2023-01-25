@@ -375,7 +375,7 @@ def generate_requirements_txt(req_file_name: str) -> None:
     
 
 
-def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> Optional[JobSettings]:
+def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> tuple[Optional[JobSettings], bool]:
     """Ensures that an environment.yml and/or requirements.txt equivalent exists for a job
     by creating the necessary files or by verifying that the specified files exist
 
@@ -383,11 +383,12 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
         settings (Optional[JobSettings]): Settings for the job to be run
 
     Returns:
-        Optional[JobSettings]: Settings for the job to be run if environment specification is valid, None otherwise
+        tuple[Optional[JobSettings], bool]: Tuple containing the job settings if valid environment, 
+            and a boolean indicating whether the job settings were modified. False if returned settings are None
     """
     # if no settings given, return None
     if settings is None:
-        return None
+        return (None, False)
 
 
     # Get environment and requirements file names
@@ -405,7 +406,7 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
         generate_env_file = True
     # Else if specified file exists, return success
     else:
-        return settings if os.path.isfile(settings.env_file) else None
+        return (settings, False) if os.path.isfile(settings.env_file) else (None, False)
 
 
     # NOTE: Only attempts generating a requirements.txt equivalent 
@@ -416,7 +417,7 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
         generate_req_file = True
     # Else if specified file does not exists, return failure
     elif not os.path.isfile(settings.req_file):
-        return None
+        return (None, False)
 
     
     # All checks succeeded, generate environment and requirements files
@@ -430,8 +431,8 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
         settings = replace(settings, **{nameof(JobSettings.req_file): req_file_name})
 
     
-    # Return changed settings    
-    return settings
+    # Return changed settings, and whether anything was changed
+    return (settings, generate_env_file or generate_req_file)
 
 
 

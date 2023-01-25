@@ -86,8 +86,13 @@ class Command:
         settings_loaded = bool(settings)
 
         # Ensure environment.yml and requirements.txt equivalents exist
-        settings = ensure_environment_specification_exists(settings)
+        settings, modified = ensure_environment_specification_exists(settings)
 
+
+        # If settings modified, save
+        # NOTE: Settings are never modified if they are invalid
+        if modified:
+            save_settings(settings)
 
         # If settings successfully loaded and environment initialized, return settings
         if settings:
@@ -112,7 +117,7 @@ class Command:
 
 
         # Ensure environment initialized
-        settings = ensure_environment_specification_exists(settings)
+        settings, modified = ensure_environment_specification_exists(settings)
 
         # If not, inform and return failure
         if not settings:
@@ -120,8 +125,9 @@ class Command:
             return None
 
 
-        # SAve final settings
-        save_settings(settings)
+        # If settings modified, save
+        if modified:
+            save_settings(settings)
 
 
         # Return populated settings
