@@ -124,7 +124,7 @@ class Command:
 
 
         # Prompt for initial setup of settings
-        settings = prompt_settings()
+        settings = prompt_settings(settings)
 
 
         # If settings prompt cancelled, return failure
