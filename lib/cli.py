@@ -89,9 +89,8 @@ class Command:
         settings, modified = ensure_environment_specification_exists(settings)
 
 
-        # If settings modified, save
-        # NOTE: Settings are never modified if they are invalid
-        if modified:
+        # If settings valid and were modified, save
+        if settings and modified:
             save_settings(settings)
 
         # If settings successfully loaded and environment initialized, return settings

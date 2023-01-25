@@ -384,7 +384,7 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
 
     Returns:
         tuple[Optional[JobSettings], bool]: Tuple containing the job settings if valid environment, 
-            and a boolean indicating whether the job settings were modified. False if returned settings are None
+            and a boolean indicating whether files were generated.
     """
     # if no settings given, return None
     if settings is None:
@@ -396,43 +396,45 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
     req_file_name = settings.req_file if settings.req_file else sprinkle_req_file_name
 
     
-    # Mark whether to generate environment and requirements files when all checks succeed
-    generate_env_file = False
-    generate_req_file = False
-    
-    
+    # Mark environment and/or requirements files were generated
+    env_file_generated = False
+    req_file_generated = False
+    # Mark whether settings do not specify missing file(s)
+    settings_valid = True
+
+
+    # Change working directory to project directory
+    working_directory_old = os.getcwd()
+    working_directory_new = settings.working_dir or working_directory_old
+
+    os.chdir(working_directory_new)
+
     # If no environment file specified, generate environment file
     if settings.env_file == "":
-        generate_env_file = True
-    # Else if specified file exists, return success
-    else:
-        return (settings, False) if os.path.isfile(settings.env_file) else (None, False)
-
-
-    # NOTE: Only attempts generating a requirements.txt equivalent 
-    #  if no environment file is specified
-
-    # If no requirements file specified, generate requirements file
-    if settings.req_file == "":
-        generate_req_file = True
-    # Else if specified file does not exists, return failure
-    elif not os.path.isfile(settings.req_file):
-        return (None, False)
-
-    
-    # All checks succeeded, generate environment and requirements files
-
-    if generate_env_file:
+        env_file_generated = True
         generate_environment_yml(settings.env_name, env_file_name, req_file_name)
         settings = replace(settings, **{nameof(JobSettings.env_file): env_file_name})
+    # Else, check if specified file exists
+    else:
+        settings_valid &= os.path.isfile(settings.env_file)
 
-    if generate_req_file:
+
+    # if no requirements file specified, generate requirements file
+    if settings.req_file == "":
+        req_file_generated = True
         generate_requirements_txt(req_file_name)
         settings = replace(settings, **{nameof(JobSettings.req_file): req_file_name})
+    # else, check if specified file exists
+    else:
+        settings_valid &= os.path.isfile(settings.req_file)
 
+
+    # Change working directory back to current working directory
+    os.chdir(working_directory_old)
     
-    # Return changed settings, and whether anything was changed
-    return (settings, generate_env_file or generate_req_file)
+    
+    # Return settings if files exist, also return whether files were generated
+    return (settings if settings_valid else None, env_file_generated or req_file_generated)
 
 
 
@@ -540,7 +542,7 @@ if [[ $? -ne 0 ]]; then
     echo "Failed to set up environment ({settings.env_name}) for job ($LSB_JOBID)." >&2
     echo 'This may be caused by multiple jobs trying to set up the same environment for the first time.' >&2
     echo 'If the job environment has NEVER been created before, a possible fix is to start one job,' >&2
-    echo 'let it finish setting up the environment, and afterwards all the other jobs,' >&2
+    echo 'let it finish setting up the environment, and afterwards start all the other jobs,' >&2
     echo 'that use the same environment, can be rapidly started.' >&2
     echo "Before doing the above, please run: conda env remove -n {settings.env_name} -y" >&2
     exit 1
