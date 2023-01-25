@@ -190,6 +190,13 @@ else
     fi
 
 
+    # Deactivate all environments
+    if [[ ! -z ${CONDA_SHLVL+x} ]]; then
+        for i in $(seq ${CONDA_SHLVL}); do
+            conda deactivate
+        done
+    fi
+
     # Activate environment for script
     conda activate ${SPRINKLE_ENV}
 
