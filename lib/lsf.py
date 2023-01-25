@@ -8,7 +8,7 @@ import re
 
 from varname import nameof
 
-from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir
+from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir, sprinkle_env_file_name, sprinkle_req_file_name
 
 
 
@@ -19,7 +19,8 @@ class JobSettings:
     env_on_done_delete: bool            = False
 
     working_dir: str                    = ""
-    env_file: str                       = "environment.yml"
+    env_file: str                       = ""
+    req_file: str                       = ""
     script: str                         = "python main.py"
 
     time_max: str                       = "24:00"
@@ -32,7 +33,7 @@ class JobSettings:
     
     email: str                          = ""
     
-    version: str                        = "1"
+    version: str                        = "2"
 
 
 @dataclass(frozen=True)
@@ -327,6 +328,109 @@ def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
 
     # Return success
     return True
+
+
+
+def generate_environment_yml(env_name: str, env_file_name: str, req_file_name: str) -> None:
+    """Generates a basic environment.yml for a job
+    
+    Args:
+        env_name (str): Name of environment
+        env_file_name (str): File path of environment file
+        req_file_name (str): File path of requirements file
+    """
+    # Open and write to environment.yml equivalent file
+    with open(env_file_name, 'w') as f:
+        f.write(f"""\
+name: {env_name}
+channels:
+  - defaults
+
+dependencies:
+  - python
+  - pip
+
+  - pip:
+    - -r {req_file_name}
+""")
+
+
+def generate_requirements_txt(req_file_name: str) -> None:
+    """Generates a requirements.txt equivalent for a job by inspecting the source code
+
+    Args:
+        req_file_name (str): File path of requirements file
+    """
+    # Get requirements
+    requirements = subprocess.run(
+        ["pipreqs", "--force", "--print"],
+        stdout=subprocess.PIPE, 
+        encoding="ascii"
+    ).stdout
+    
+    # Open and write to requirements.txt equivalent file
+    with open(req_file_name, 'w') as f:
+        f.write(requirements)
+    
+
+
+def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> Optional[JobSettings]:
+    """Ensures that an environment.yml and/or requirements.txt equivalent exists for a job
+    by creating the necessary files or by verifying that the specified files exist
+
+    Args:
+        settings (Optional[JobSettings]): Settings for the job to be run
+
+    Returns:
+        Optional[JobSettings]: Settings for the job to be run if environment specification is valid, None otherwise
+    """
+    # if no settings given, return None
+    if settings is None:
+        return None
+
+
+    # Get environment and requirements file names
+    env_file_name = settings.env_file if settings.env_file else sprinkle_env_file_name
+    req_file_name = settings.req_file if settings.req_file else sprinkle_req_file_name
+
+    
+    # Mark whether to generate environment and requirements files when all checks succeed
+    generate_env_file = False
+    generate_req_file = False
+    
+    
+    # If no environment file specified, generate environment file
+    if settings.env_file == "":
+        generate_env_file = True
+    # Else if specified file exists, return success
+    else:
+        return settings if os.path.isfile(settings.env_file) else None
+
+
+    # NOTE: Only attempts generating a requirements.txt equivalent 
+    #  if no environment file is specified
+
+    # If no requirements file specified, generate requirements file
+    if settings.req_file == "":
+        generate_req_file = True
+    # Else if specified file does not exists, return failure
+    elif not os.path.isfile(settings.req_file):
+        return None
+
+    
+    # All checks succeeded, generate environment and requirements files
+
+    if generate_env_file:
+        generate_environment_yml(settings.env_name, env_file_name, req_file_name)
+        settings = replace(settings, {nameof(JobSettings.env_file): env_file_name})
+
+    if generate_req_file:
+        generate_requirements_txt(req_file_name)
+        settings = replace(settings, {nameof(JobSettings.req_file): req_file_name})
+
+    
+    # Return changed settings    
+    return settings
 
 
 

@@ -1,5 +1,6 @@
 # 🪄✨Sprinkle✨
-Sprinkle is used to simplify deployment of scripts to DTU's High Performance Computing Cluster. 
+Sprinkle is used to simplify deployment of Python scripts to DTU's High Performance Computing Cluster. 
+It may also work for other languages, but this has not been tested.
 
 
 # ✅ Feature list
@@ -46,30 +47,24 @@ wget -O 'sprinkle-installer' 'https://raw.githubusercontent.com/sarphiv/sprinkle
 All commands below should be ❗ **run in your project directory** ❗.
 
 1. **On your local machine**
-    1. `conda activate <environment name>` _(activate your project's environment)_
-    0. `conda env export > environment.yml` _(or create the environment file manually - see FAQ below)_
-    0. Transfer project directory to DTU's HPC cluster _(see FAQ below)_
+    1. Transfer project directory to DTU's HPC cluster _(see FAQ below)_
 2. **On DTU's HPC cluster**
-    1. `sprinkle start` and then enter job parameters _(such as CPU cores, memory, time, and main script)_
+    1. `sprinkle start` and then enter job parameters _(such as main script, CPU cores, memory, and time)_
     0. `sprinkle help` _(view other commands)_
 
+Sprinkle will attempt to automatically detect and setup your packages.
+If this fails, check the FAQ below for how to create an environment file.
 
 # 📖 Frequently asked questions
 <details>
   <summary><b>How do I create the environment file?</b></summary>
 
-  There are multiple ways. However, remember the `environment.yml` file 
-  should be created **before transfering your project to DTU's HPC cluster**.
+  There are multiple ways. If no environment file (or requirements file) is specified, 
+  Sprinkle will attempt to automatically create one for you. 
+  If your script fails because of the above, you may need use one of the methods below.
+  Once you are done, run `sprinkle settings` and select your environment file.
 
-  - Either __**create a new environment**__
-    ```bash
-    conda create -n new_environment_name
-    conda activate new_environment_name
-    conda install <package_name1> <package_name2> ...
-    pip install <package_name1> <package_name2> ...
-    conda env export > environment.yml
-    ```
-  - Or __**manually write the `environment.yml` file**__
+  - Either __**manually write the `environment.yml` file**__ (⭐ **Recommended method** ⭐)
     1. Create a new file called `environment.yml` (can be done with `touch environment.yml`)
     0. Write your environment file (example below, version numbers can be specified).
         ```yaml
@@ -79,20 +74,35 @@ All commands below should be ❗ **run in your project directory** ❗.
           - conda-forge
           - pytorch
         dependencies:
-          - python
-          - pip
+          - pip=22.3.1
+          - python=3.10.8
           - pytorch
           - pytorch-cuda
           - torchvision
           - torchaudio
           - pip:
             - scikit-learn
+            - tqdm==4.61.1
             - opencv-python
-            - tqdm
         ```
+  - Or __**export your existing environment**__
+    ```bash
+    conda activate <environment name>
+    conda env export > environment.yml
+    ```
+  - Or __**create a new environment**__
+    ```bash
+    conda create -n new_environment_name
+    conda activate new_environment_name
+    conda install <package_name1> <package_name2> ...
+    pip install <package_name1> <package_name2> ...
+    conda env export > environment.yml
+    ```
 
-  Test your code with your new environment on your own computer first.
-  It is much easier to find and fix issues there than on DTU's HPC cluster.
+  Remember the `environment.yml` file 
+  should be created **before transfering your project to DTU's HPC cluster**.
+  This way you can test your code with your environment on your own computer first.
+  It is much easier to test, find, and fix issues there than on DTU's HPC cluster.
 </details>
 
 <details>

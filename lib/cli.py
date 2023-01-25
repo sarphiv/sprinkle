@@ -5,7 +5,7 @@ from typing import Union, Optional, Literal
 from tabulate import tabulate
 
 from constants import sprinkle_project_settings_export_file
-from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active, view_job
+from lsf import JobSettings, generate_bsub_script, ensure_environment_specification_exists, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active, view_job
 from lsf_prompt import prompt_settings, prompt_job_active, prompt_jobs_active
 from prompt import prompt_choice
 
@@ -74,26 +74,54 @@ Options:
 
 
 class Command:
-    def _load_or_create_settings() -> Optional[JobSettings]:
+    def _ensure_project_initialized() -> Optional[JobSettings]:
         """Load settings, or create new settings via prompt if none exist.
+        Also auto-generates the environment.yml and requirements.txt files if they don't exist.
         
         Returns:
             Optional[JobSettings]: Loaded or created settings.
         """
         # Load settings
         settings = load_settings()
+        settings_loaded = bool(settings)
 
-        # If no settings available, attempt creating
+        # Ensure environment.yml and requirements.txt equivalents exist
+        settings = ensure_environment_specification_exists(settings)
+
+
+        # If settings successfully loaded and environment initialized, return settings
+        if settings:
+            return settings
+
+        # If settings loaded but environment not initialized, inform and return failure
+        if settings_loaded:
+            print("ERROR: Environment and/or requirements file(s) have been specified but do not exist.")
+            return None
+        
+        
+        # Settings do not exist, prompt for settings
+        settings = prompt_settings(JobSettings())
+
+        # If settings prompt cancelled, return failure
         if not settings:
-            # Prompt for settings
-            settings = prompt_settings(JobSettings())
-            
-            # If settings prompt cancelled, return failure
-            if not settings:
-                return None
+            return None
 
-            # Save new settings
-            save_settings(settings)
+
+        # Save intermediate settings
+        save_settings(settings)
+
+
+        # Ensure environment initialized
+        settings = ensure_environment_specification_exists(settings)
+
+        # If not, inform and return failure
+        if not settings:
+            print("ERROR: Environment and/or requirements file(s) have been specified but do not exist.")
+            return None
+
+
+        # SAve final settings
+        save_settings(settings)
 
 
         # Return populated settings
@@ -111,7 +139,7 @@ class Command:
             int: 0 if successful, 1 if failure.
         """
         # Load settings
-        settings = Command._load_or_create_settings()
+        settings = Command._ensure_project_initialized()
         # If no settings, return failure
         if not settings:
             return 1
@@ -351,7 +379,7 @@ class Command:
 
 
         # Load settings
-        settings = Command._load_or_create_settings()
+        settings = Command._ensure_project_initialized()
         # If no settings, return failure
         if not settings:
             return 1

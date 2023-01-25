@@ -38,7 +38,9 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
     f"{nameof(JobSettings.working_dir)}": 
         ("Working directory", empty_coalesce(getcwd())),
     f"{nameof(JobSettings.env_file)}": 
-        ("Environment file", as_is),
+        ("Environment file", empty_coalesce("[Auto-generated ONCE on first run]")),
+    f"{nameof(JobSettings.req_file)}": 
+        ("Requirements file", empty_coalesce("[Auto-generated ONCE on first run]")),
     f"{nameof(JobSettings.script)}": 
         ("Script (or command)", as_is),
 
@@ -181,7 +183,8 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = l
     f"{nameof(JobSettings.env_on_done_delete)}": prompt_new_boolean,
 
     f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
-    f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=False),
+    f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=True),
+    f"{nameof(JobSettings.req_file)}": prompt_new_file(allow_empty=True),
     f"{nameof(JobSettings.script)}": prompt_new_script,
 
     f"{nameof(JobSettings.time_max)}": prompt_new_time,
