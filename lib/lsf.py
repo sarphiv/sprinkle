@@ -365,6 +365,7 @@ def generate_requirements_txt(req_file_name: str) -> None:
     requirements = subprocess.run(
         ["pipreqs", "--force", "--print"],
         stdout=subprocess.PIPE, 
+        stderr=subprocess.DEVNULL,
         encoding="ascii"
     ).stdout
     
