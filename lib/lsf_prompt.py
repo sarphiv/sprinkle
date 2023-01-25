@@ -28,27 +28,8 @@ def empty_coalesce(default_value: str) -> str:
 
 
 job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
-    f"{nameof(JobSettings.name)}": 
-        ("Job name", as_is),
-    f"{nameof(JobSettings.env_name)}": 
-        ("Environment name", as_is),
-    f"{nameof(JobSettings.env_on_done_delete)}": 
-        ("Auto-delete environment", as_is_boolean),
-
-    f"{nameof(JobSettings.working_dir)}": 
-        ("Working directory", empty_coalesce(getcwd())),
-    f"{nameof(JobSettings.env_file)}": 
-        ("Environment file", empty_coalesce("[Auto-generated ONCE]")),
-    f"{nameof(JobSettings.req_file)}": 
-        ("Requirements file", empty_coalesce("[Auto-generated ONCE]")),
     f"{nameof(JobSettings.script)}": 
         ("Script (or command)", as_is),
-
-    f"{nameof(JobSettings.time_max)}": 
-        ("Job max time (HH:mm)", as_is),
-    f"{nameof(JobSettings.queue)}": 
-        ("Cluster queue", as_is),
-    # Skipping: is_gpu_queue
 
     f"{nameof(JobSettings.cpu_cores)}": 
         ("CPU cores", as_is),
@@ -56,6 +37,26 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
         ("Per CPU core memory", surround(suffix=" MB")),
     f"{nameof(JobSettings.cpu_mem_max_gb)}": 
         ("Max total CPU memory", surround(suffix=" GB")),
+
+    f"{nameof(JobSettings.env_file)}": 
+        ("Environment file", empty_coalesce("[Auto-generated ONCE]")),
+    f"{nameof(JobSettings.req_file)}": 
+        ("Requirements file", empty_coalesce("[Auto-generated ONCE]")),
+    f"{nameof(JobSettings.working_dir)}": 
+        ("Working directory", empty_coalesce(getcwd())),
+
+    f"{nameof(JobSettings.queue)}": 
+        ("Cluster queue", as_is),
+    # Skipping: is_gpu_queue
+    f"{nameof(JobSettings.time_max)}": 
+        ("Job max time (HH:mm)", as_is),
+
+    f"{nameof(JobSettings.name)}": 
+        ("Job name", as_is),
+    f"{nameof(JobSettings.env_name)}": 
+        ("Environment name", as_is),
+    f"{nameof(JobSettings.env_on_done_delete)}": 
+        ("Auto-delete environment", as_is_boolean),
 
     f"{nameof(JobSettings.email)}": 
         ("Notification email", empty_coalesce("No notification")),
@@ -184,22 +185,23 @@ def prompt_new_queue(attr: str, value_current: str, value_default: str) -> str:
 
 
 job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = lambda: {
-    f"{nameof(JobSettings.name)}": prompt_new_string(allow_empty=False),
-    f"{nameof(JobSettings.env_name)}": prompt_new_string(allow_empty=False),
-    f"{nameof(JobSettings.env_on_done_delete)}": prompt_new_boolean,
-
-    f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
-    f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=True),
-    f"{nameof(JobSettings.req_file)}": prompt_new_file(allow_empty=True),
     f"{nameof(JobSettings.script)}": prompt_new_script,
-
-    f"{nameof(JobSettings.time_max)}": prompt_new_time,
-    f"{nameof(JobSettings.queue)}": prompt_new_queue,
-    # Skipping: is_gpu_queue
 
     f"{nameof(JobSettings.cpu_cores)}": prompt_new_natural,
     f"{nameof(JobSettings.cpu_mem_per_core_mb)}": prompt_new_natural,
     f"{nameof(JobSettings.cpu_mem_max_gb)}": prompt_new_natural,
+
+    f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=True),
+    f"{nameof(JobSettings.req_file)}": prompt_new_file(allow_empty=True),
+    f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
+
+    f"{nameof(JobSettings.queue)}": prompt_new_queue,
+    # Skipping: is_gpu_queue
+    f"{nameof(JobSettings.time_max)}": prompt_new_time,
+
+    f"{nameof(JobSettings.name)}": prompt_new_string(allow_empty=False),
+    f"{nameof(JobSettings.env_name)}": prompt_new_string(allow_empty=False),
+    f"{nameof(JobSettings.env_on_done_delete)}": prompt_new_boolean,
 
     f"{nameof(JobSettings.email)}": prompt_new_string(allow_empty=True),
 

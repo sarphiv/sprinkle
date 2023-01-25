@@ -14,26 +14,27 @@ from constants import sprinkle_project_dir, sprinkle_project_settings_file, spri
 
 @dataclass(frozen=True)
 class JobSettings:
+    script: str                         = "python main.py"
+
+    cpu_cores: int                      = 16
+    cpu_mem_per_core_mb: int            = 512
+    cpu_mem_max_gb: int                 = 6
+
+    env_file: str                       = ""
+    req_file: str                       = ""
+    working_dir: str                    = ""
+
+    queue: str                          = "hpc"
+    is_gpu_queue: bool                  = False
+    time_max: str                       = "24:00"
+
     name: str                           = "default-job-name"
     env_name: str                       = "default-env-name"
     env_on_done_delete: bool            = False
 
-    working_dir: str                    = ""
-    env_file: str                       = ""
-    req_file: str                       = ""
-    script: str                         = "python main.py"
-
-    time_max: str                       = "24:00"
-    queue: str                          = "hpc"
-    is_gpu_queue: bool                  = False
-    
-    cpu_cores: int                      = 16
-    cpu_mem_per_core_mb: int            = 512
-    cpu_mem_max_gb: int                 = 6
-    
     email: str                          = ""
     
-    version: str                        = "2"
+    version: str                        = "3"
 
 
 @dataclass(frozen=True)
