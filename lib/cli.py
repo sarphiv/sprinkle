@@ -417,24 +417,6 @@ class Command:
 
         # Return success
         return 0
-        
-        
-        
-        
-        
-        # Load settings
-        settings = load_settings() or JobSettings()
-        
-        # Prompt about settings
-        settings = prompt_settings(settings)
-        
-        # If settings changed, save settings and return success
-        if settings:
-            save_settings(settings)
-            return 0
-        # Else settings not changed, return failure
-        else:
-            return 1
 
 
 
