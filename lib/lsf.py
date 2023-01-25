@@ -406,7 +406,6 @@ def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> 
     # Change working directory to project directory
     working_directory_old = os.getcwd()
     working_directory_new = settings.working_dir or working_directory_old
-
     os.chdir(working_directory_new)
 
     # If no environment file specified, generate environment file

@@ -1,10 +1,12 @@
 import os
 import traceback
 from typing import Union, Optional, Literal
+from dataclasses import replace
+from varname import nameof
 
 from tabulate import tabulate
 
-from constants import sprinkle_project_settings_export_file
+from constants import sprinkle_project_settings_export_file, sprinkle_env_file_name, sprinkle_req_file_name
 from lsf import JobSettings, generate_bsub_script, ensure_environment_specification_exists, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active, view_job
 from lsf_prompt import prompt_settings, prompt_job_active, prompt_jobs_active
 from prompt import prompt_choice
@@ -101,10 +103,29 @@ class Command:
         if settings_loaded:
             print("ERROR: Environment and/or requirements file(s) have been specified but do not exist.")
             return None
+
+
+        # Settings do not exist, create new default settings
+        settings = JobSettings()
+
+        # Change working directory to project directory
+        working_directory_old = os.getcwd()
+        working_directory_new = settings.working_dir or working_directory_old
+        os.chdir(working_directory_new)
         
-        
-        # Settings do not exist, prompt for settings
-        settings = prompt_settings(JobSettings())
+        # Initialize settings to environment and requirements files if present
+        if os.path.isfile(sprinkle_env_file_name):
+            settings = replace(settings, **{nameof(JobSettings.env_file): sprinkle_env_file_name})
+        if os.path.isfile(sprinkle_req_file_name):
+            settings = replace(settings, **{nameof(JobSettings.req_file): sprinkle_req_file_name})
+
+        # Change working directory back to current working directory
+        os.chdir(working_directory_old)
+
+
+        # Prompt for initial setup of settings
+        settings = prompt_settings()
+
 
         # If settings prompt cancelled, return failure
         if not settings:
