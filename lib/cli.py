@@ -151,16 +151,20 @@ class Command:
             return 1
 
 
-        # Check if environment file exists, inform and fail if not
+        # Check if environment and requirements files exists, inform and fail if not
         working_directory_old = os.getcwd()
         working_directory_new = settings.working_dir or working_directory_old
 
         os.chdir(working_directory_new)
         environment_exists = os.path.isfile(settings.env_file)
+        requirements_exists = os.path.isfile(settings.req_file)
         os.chdir(working_directory_old)
 
         if not environment_exists:
             print(f'ERROR: Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
+            return 1
+        if not requirements_exists:
+            print(f'ERROR: Requirements file "{settings.req_file}" does not exist in working directory "{working_directory_new}"')
             return 1
 
 
