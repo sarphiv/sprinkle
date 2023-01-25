@@ -76,6 +76,31 @@ Options:
 
 
 class Command:
+    def _check_environment_specification_exists(settings: JobSettings, inform: bool = False) -> bool:
+        # Change working directory to project directory
+        working_directory_old = os.getcwd()
+        working_directory_new = settings.working_dir or working_directory_old
+        os.chdir(working_directory_new)
+        
+        # Check for file existence
+        environment_exists = os.path.isfile(settings.env_file)
+        requirements_exists = os.path.isfile(settings.req_file)
+        
+        # Change working directory back to current working directory
+        os.chdir(working_directory_old)
+
+        # Inform of missing files
+        if inform:
+            if not environment_exists:
+                print(f'ERROR: Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
+            if not requirements_exists:
+                print(f'ERROR: Requirements file "{settings.req_file}" does not exist in working directory "{working_directory_new}"')
+
+
+        # Return whether both files exist
+        return environment_exists and requirements_exists
+
+
     def _ensure_project_initialized() -> Optional[JobSettings]:
         """Load settings, or create new settings via prompt if none exist.
         Also auto-generates the environment.yml and requirements.txt files if they don't exist.
@@ -88,20 +113,20 @@ class Command:
         settings_loaded = bool(settings)
 
         # Ensure environment.yml and requirements.txt equivalents exist
-        settings, modified = ensure_environment_specification_exists(settings)
+        settings_new, modified = ensure_environment_specification_exists(settings)
 
 
         # If settings valid and were modified, save
-        if settings and modified:
-            save_settings(settings)
+        if settings_new and modified:
+            save_settings(settings_new)
 
         # If settings successfully loaded and environment initialized, return settings
-        if settings:
-            return settings
+        if settings_new:
+            return settings_new
 
         # If settings loaded but environment not initialized, inform and return failure
         if settings_loaded:
-            print("ERROR: Environment and/or requirements file(s) have been specified but do not exist.")
+            Command._check_environment_specification_exists(settings, inform=True)
             return None
 
 
@@ -137,21 +162,21 @@ class Command:
 
 
         # Ensure environment initialized
-        settings, modified = ensure_environment_specification_exists(settings)
+        settings_new, modified = ensure_environment_specification_exists(settings)
 
         # If not, inform and return failure
-        if not settings:
-            print("ERROR: Environment and/or requirements file(s) have been specified but do not exist.")
+        if not settings_new:
+            Command._check_environment_specification_exists(settings, inform=True)
             return None
 
 
         # If settings modified, save
         if modified:
-            save_settings(settings)
+            save_settings(settings_new)
 
 
         # Return populated settings
-        return settings
+        return settings_new
 
 
 
@@ -172,19 +197,7 @@ class Command:
 
 
         # Check if environment and requirements files exists, inform and fail if not
-        working_directory_old = os.getcwd()
-        working_directory_new = settings.working_dir or working_directory_old
-
-        os.chdir(working_directory_new)
-        environment_exists = os.path.isfile(settings.env_file)
-        requirements_exists = os.path.isfile(settings.req_file)
-        os.chdir(working_directory_old)
-
-        if not environment_exists:
-            print(f'ERROR: Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
-            return 1
-        if not requirements_exists:
-            print(f'ERROR: Requirements file "{settings.req_file}" does not exist in working directory "{working_directory_new}"')
+        if not Command._check_environment_specification_exists(settings, inform=True):
             return 1
 
 
@@ -376,6 +389,39 @@ class Command:
         Returns:
             int: 0 if settings changed, 1 if settings not changed.
         """
+        # Load settings
+        settings = load_settings() or JobSettings()
+        
+        # Prompt about settings
+        settings = prompt_settings(settings)
+
+        # If cancelled, return failure
+        if not settings:
+            return 1
+
+        # Save intermediate settings
+        save_settings(settings)
+        
+        
+        # Ensure environment initialized
+        settings_new, modified = ensure_environment_specification_exists(settings)
+        # If not, inform and return failure
+        if not settings_new:
+            Command._check_environment_specification_exists(settings, inform=True)
+            return 1
+
+        # If settings modified, save
+        if modified:
+            save_settings(settings_new)
+
+
+        # Return success
+        return 0
+        
+        
+        
+        
+        
         # Load settings
         settings = load_settings() or JobSettings()
         
