@@ -164,7 +164,7 @@ Usage:
     Stop specific jobs or all jobs.
     If nothing specified, prompt to select job to kill.
 
-  sprinkle view [((output | log | error) [<job_id>])]
+  sprinkle view [((output | log | error) [<job_id>])] [-a | --all]
     View output, log, or errors of a specific job.
 
   sprinkle status
@@ -187,7 +187,7 @@ Usage:
 
 Options:
   -h -? --help       Show full help text.
-  -a --all           Kill all jobs
+  -a --all           For start, kill all jobs; For view, view full file.
 ```
 
 # 🧑‍⚖️ Disclaimer

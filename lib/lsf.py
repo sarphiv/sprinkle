@@ -283,12 +283,13 @@ def get_jobs_active() -> dict[str, JobDetails]:
 
 
 
-def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
+def view_job(type: Literal["output", "log", "error"], job_id: str, all: bool) -> bool:
     """View job output, log, or error
 
     Args:
         type (Literal["output", "log", "error"]): Type of file to view
         job_id (str): Job ID
+        all (bool): View all output, log, or error
 
     Returns:
         bool: True if file exists and was successfully viewed, False otherwise
@@ -322,7 +323,7 @@ def view_job(type: Literal["output", "log", "error"], job_id: str) -> bool:
 
     # Track bottom of file
     try:
-        subprocess.run(["tail", "-f", f"{directory}/{file}"])
+        subprocess.run((["less"] if all else ["tail", "-f"]) + [f"{directory}/{file}"])
     except KeyboardInterrupt:
         pass
 

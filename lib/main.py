@@ -40,7 +40,8 @@ try:
                 "error" if "error" in args else 
                 None,
             args["<job_id>"][0] if "<job_id>" in args else 
-                None
+                None,
+            args["-a"] in args
         )
 
     elif "status" in args:

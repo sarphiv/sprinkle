@@ -18,7 +18,7 @@ doc_short = \
 Usage:
   sprinkle start [--] [<args>...]
   sprinkle stop [<job_id>... | -a | --all]
-  sprinkle view [((output | log | error) [<job_id>])]
+  sprinkle view [((output | log | error) [<job_id>])] [-a | --all]
   sprinkle status
   sprinkle settings
   sprinkle export [<path>] [--] [<args>...]
@@ -27,7 +27,7 @@ Usage:
 
 Options:
   -h -? --help       Show full help text.
-  -a --all           Kill all jobs
+  -a --all           For start, kill all jobs; For view, view full file.
 """
 
 # NOTE: Remember to update README.md
@@ -47,7 +47,7 @@ Usage:
     Stop specific jobs or all jobs.
     If nothing specified, prompt to select job to kill.
 
-  sprinkle view [((output | log | error) [<job_id>])]
+  sprinkle view [((output | log | error) [<job_id>])] [-a | --all]
     View output, log, or errors of a specific job.
 
   sprinkle status
@@ -70,13 +70,22 @@ Usage:
 
 Options:
   -h -? --help       Show full help text.
-  -a --all           Kill all jobs
+  -a --all           For start, kill all jobs; For view, view full file.
 """
 
 
 
 class Command:
     def _check_environment_specification_exists(settings: JobSettings, inform: bool = False) -> bool:
+        """Check whether environment specification exists.
+        
+        Args:
+            settings {JobSettings}: Settings to base the check on
+            inform {bool}: Whether to inform of missing files (default: {False})
+        
+        Returns:
+            bool: True if both files exist
+        """
         # Change working directory to project directory
         working_directory_old = os.getcwd()
         working_directory_new = settings.working_dir or working_directory_old
@@ -279,12 +288,13 @@ class Command:
 
 
 
-    def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str]) -> int:
+    def view(type: Optional[Literal["output", "log", "error"]], job_id: Optional[str], all: bool) -> int:
         """View output, log, or errors of a specific job.
         
         Args:
             type (Optional[Literal["output", "log", "error"]], optional): Type of view. Defaults to None which prompts for a view.
             job_id (Optional[str], optional): Job ID to view. Defaults to None which prompts for an active job.
+            all (bool): Whether to view the full file.
         
         Returns:
             int: 0 if successful, 1 if failure.
@@ -328,7 +338,7 @@ class Command:
 
 
         # View job
-        success = view_job(type, job_id)
+        success = view_job(type, job_id, all)
 
 
         # If not successful, inform
