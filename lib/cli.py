@@ -37,6 +37,8 @@ Sprinkle streamlines management of LSF jobs.
 
 Project repository: https://github.com/sarphiv/sprinkle
 
+In the below, "spr" may be used as a shorthand for "sprinkle".
+
 
 Usage:
   sprinkle start [--] [<args>...]
