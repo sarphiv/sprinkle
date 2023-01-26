@@ -464,7 +464,7 @@ def generate_bsub_script(settings: JobSettings, args: list[str] = []) -> str:
 +
 conditional_string(settings.is_gpu_queue,
 f'''
-### GPUs to request and if to reserve it exclusively\n"
+### GPUs to request and if to reserve it exclusively\n
 #BSUB -gpu "num=1:mode=exclusive_process"''')
 +
 f"""
@@ -545,7 +545,7 @@ if [[ $? -ne 0 ]]; then
     echo 'If the job environment has NEVER been created before, a possible fix is to start one job,' >&2
     echo 'let it finish setting up the environment, and afterwards start all the other jobs,' >&2
     echo 'that use the same environment, can be rapidly started.' >&2
-    echo "Before doing the above, please run: conda env remove -n {settings.env_name} -y" >&2
+    echo 'BEFORE DOING THE ABOVE, PLEASE RUN: conda env remove -n {settings.env_name} -y' >&2
     exit 1
 fi
 
