@@ -17,8 +17,7 @@ class JobSettings:
     script: str                         = "python main.py"
 
     cpu_cores: int                      = 16
-    cpu_mem_per_core_mb: int            = 512
-    cpu_mem_max_gb: int                 = 6
+    cpu_mem_gb: int                     = 8
 
     env_file: str                       = ""
     req_file: str                       = ""
@@ -478,11 +477,8 @@ f"""
 export OMP_NUM_THREADS=$LSB_DJOB_NUMPROC
 
 
-### Amount of memory per core
-#BSUB -R "rusage[mem={settings.cpu_mem_per_core_mb}MB]" 
-
-### Maximum amount of memory before killing task
-#BSUB -M {settings.cpu_mem_max_gb}GB
+### Amount of memory to request
+#BSUB -R "rusage[mem={settings.cpu_mem_gb}GB]"
 
 
 ### Wall time (HH:MM), how long before killing task

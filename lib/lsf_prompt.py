@@ -33,10 +33,8 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
 
     f"{nameof(JobSettings.cpu_cores)}": 
         ("CPU cores", as_is),
-    f"{nameof(JobSettings.cpu_mem_per_core_mb)}": 
-        ("Per CPU core memory", surround(suffix=" MB")),
-    f"{nameof(JobSettings.cpu_mem_max_gb)}": 
-        ("Max total CPU memory", surround(suffix=" GB")),
+    f"{nameof(JobSettings.cpu_mem_gb)}": 
+        ("CPU memory requested", surround(suffix=" GB")),
 
     f"{nameof(JobSettings.env_file)}": 
         ("Environment file", empty_coalesce("[Auto-generated ONCE]")),
@@ -188,8 +186,7 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = l
     f"{nameof(JobSettings.script)}": prompt_new_script,
 
     f"{nameof(JobSettings.cpu_cores)}": prompt_new_natural,
-    f"{nameof(JobSettings.cpu_mem_per_core_mb)}": prompt_new_natural,
-    f"{nameof(JobSettings.cpu_mem_max_gb)}": prompt_new_natural,
+    f"{nameof(JobSettings.cpu_mem_gb)}": prompt_new_natural,
 
     f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=True),
     f"{nameof(JobSettings.req_file)}": prompt_new_file(allow_empty=True),
