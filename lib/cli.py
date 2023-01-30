@@ -6,9 +6,10 @@ from varname import nameof
 
 from tabulate import tabulate
 
-from constants import sprinkle_project_settings_export_file, sprinkle_env_file_name, sprinkle_req_file_name
-from lsf import JobSettings, generate_bsub_script, ensure_environment_specification_exists, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active, view_job
+from constants import sprinkle_project_settings_export_file
+from lsf import JobSettings, generate_bsub_script, kill_jobs, load_settings, save_settings, submit_job, get_jobs_active, view_job
 from lsf_prompt import prompt_settings, prompt_job_active, prompt_jobs_active
+from conda import ensure_environment_specification_exists, delete_environment, recreate_environment, exists_environment
 from prompt import prompt_choice
 
 
@@ -21,6 +22,7 @@ Usage:
   sprinkle view [((output | log | error) [<job_id>])] [-a | --all]
   sprinkle status
   sprinkle settings
+  sprinkle setup [-d | --delete]
   sprinkle export [<path>] [--] [<args>...]
   sprinkle update
   sprinkle [help | -h | -? | --help]
@@ -28,6 +30,7 @@ Usage:
 Options:
   -h -? --help       Show full help text.
   -a --all           For start, kill all jobs; For view, view full file.
+  -d --delete        Delete environment without recreating it.
 """
 
 # NOTE: Remember to update README.md
@@ -43,6 +46,8 @@ In the below, "spr" may be used as a shorthand for "sprinkle".
 Usage:
   sprinkle start [--] [<args>...]
     Submit the job script and pass <args> to job script.
+    If settings have not been setup, prompt to set them up.
+    If environment has not been setup, sets it up.
     If <args> contains dashes, add the two dashes "--" before <args>.
 
   sprinkle stop [<job_id>... | -a | --all]
@@ -57,6 +62,10 @@ Usage:
 
   sprinkle settings
     Set up or change existing job settings.
+    
+  sprinkle setup [-d | --delete]
+    Set up job environment (or recreates it in case of changes).
+    If settings have not been setup, prompt to set them up.
 
   sprinkle export [<path>] [<args>...]
     Export submission script to <path> that passes <args> to the job script.
@@ -73,6 +82,7 @@ Usage:
 Options:
   -h -? --help       Show full help text.
   -a --all           For start, kill all jobs; For view, view full file.
+  -d --delete        Delete environment without recreating it.
 """
 
 
@@ -88,24 +98,17 @@ class Command:
         Returns:
             bool: True if both files exist
         """
-        # Change working directory to project directory
-        working_directory_old = os.getcwd()
-        working_directory_new = settings.working_dir or working_directory_old
-        os.chdir(working_directory_new)
-        
         # Check for file existence
         environment_exists = os.path.isfile(settings.env_file)
         requirements_exists = os.path.isfile(settings.req_file)
-        
-        # Change working directory back to current working directory
-        os.chdir(working_directory_old)
+
 
         # Inform of missing files
         if inform:
             if not environment_exists:
-                print(f'ERROR: Environment file "{settings.env_file}" does not exist in working directory "{working_directory_new}"')
+                print(f'ERROR: Environment file "{settings.env_file}" does not exist')
             if not requirements_exists:
-                print(f'ERROR: Requirements file "{settings.req_file}" does not exist in working directory "{working_directory_new}"')
+                print(f'ERROR: Requirements file "{settings.req_file}" does not exist')
 
 
         # Return whether both files exist
@@ -144,19 +147,12 @@ class Command:
         # Settings do not exist, create new default settings
         settings = JobSettings()
 
-        # Change working directory to project directory
-        working_directory_old = os.getcwd()
-        working_directory_new = settings.working_dir or working_directory_old
-        os.chdir(working_directory_new)
         
         # Initialize settings to environment and requirements files if present
-        if os.path.isfile(sprinkle_env_file_name):
-            settings = replace(settings, **{nameof(JobSettings.env_file): sprinkle_env_file_name})
-        if os.path.isfile(sprinkle_req_file_name):
-            settings = replace(settings, **{nameof(JobSettings.req_file): sprinkle_req_file_name})
-
-        # Change working directory back to current working directory
-        os.chdir(working_directory_old)
+        if os.path.isfile(JobSettings.defaults.env_file()):
+            settings = replace(settings, **{nameof(JobSettings.env_file): JobSettings.defaults.env_file()})
+        if os.path.isfile(JobSettings.defaults.req_file()):
+            settings = replace(settings, **{nameof(JobSettings.req_file): JobSettings.defaults.req_file()})
 
 
         # Prompt for initial setup of settings
@@ -205,6 +201,11 @@ class Command:
         # If no settings, return failure
         if not settings:
             return 1
+
+
+        # If environment not yet set up, set it up
+        if not exists_environment(settings.env_name):
+            recreate_environment(settings.env_name, settings.env_file, output=True)
 
 
         # Check if environment and requirements files exists, inform and fail if not
@@ -429,6 +430,30 @@ class Command:
 
         # Return success
         return 0
+
+
+
+    def setup(delete: bool = False) -> int:
+        """Recreate environment.
+        
+        Args:
+            delete (bool, optional): Whether to only delete environment. Defaults to False.
+        
+        Returns:
+            int: 0 if successful, 1 if failure.
+        """
+        # Load settings
+        settings = Command._ensure_project_initialized()
+        # If no settings, return failure
+        if not settings:
+            return 1
+
+        # If delete only, delete environment
+        if delete:
+            return 1 if delete_environment(settings.env_name, output=True) else 0
+        # Else, recreate environment
+        else:
+            return 1 if recreate_environment(settings.env_name, settings.env_file, output=True) else 0
 
 
 

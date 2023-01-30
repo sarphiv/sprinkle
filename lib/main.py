@@ -49,6 +49,9 @@ try:
 
     elif "settings" in args:
         exit_code = Command.settings()
+        
+    elif "setup" in args:
+        exit_code = Command.setup("-d" in args)
 
     elif "export" in args:
         exit_code = Command.export(

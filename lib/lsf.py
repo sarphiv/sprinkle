@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Optional, Literal, Callable
 from dataclasses import dataclass, replace
 from itertools import islice
 import pickle
@@ -8,32 +8,43 @@ import re
 
 from varname import nameof
 
-from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir, sprinkle_env_file_name, sprinkle_req_file_name
+from constants import sprinkle_project_dir, sprinkle_project_settings_file, sprinkle_project_log_dir, sprinkle_project_error_dir, sprinkle_project_output_dir
 
 
 
 @dataclass(frozen=True)
 class JobSettings:
-    script: str                         = "python main.py"
+    script: str                            = "python main.py"
 
-    cpu_cores: int                      = 16
-    cpu_mem_gb: int                     = 8
+    cpu_cores: int                         = 16
+    cpu_mem_gb: int                        = 8
 
-    env_file: str                       = ""
-    req_file: str                       = ""
-    working_dir: str                    = ""
+    env_file: str                          = "" # Auto-generated upon setup if empty
+    req_file: str                          = "" # Auto-generated upon setup if empty
+    working_dir: str                       = ""
 
-    queue: str                          = "hpc"
-    is_gpu_queue: bool                  = False
-    time_max: str                       = "24:00"
+    queue: str                             = "hpc"
+    is_gpu_queue: bool                     = False
+    time_max: str                          = "24:00"
 
-    name: str                           = "default-job-name"
-    env_name: str                       = "default-env-name"
-    env_on_done_delete: bool            = False
-
-    email: str                          = ""
+    name: str                              = ""
+    env_name: str                          = ""
     
-    version: str                        = "3"
+    env_on_done_delete: bool               = False
+
+    email: str                             = ""
+    
+    version: str                           = "4"
+    
+    
+    class defaults:
+        env_file: str                      = lambda: "environment.yml"
+        req_file: str                      = lambda: "requirements.txt"
+        working_dir: Callable[[], str]     = os.getcwd
+        
+        name: Callable[[], str]            = lambda: os.path.basename(os.getcwd()).replace(' ', '-')
+        env_name: Callable[[], str]        = lambda: os.path.basename(os.getcwd()).replace(' ', '-') + "-env"
+        
 
 
 @dataclass(frozen=True)
@@ -332,112 +343,6 @@ def view_job(type: Literal["output", "log", "error"], job_id: str, all: bool) ->
 
 
 
-def generate_environment_yml(env_name: str, env_file_name: str, req_file_name: str) -> None:
-    """Generates a basic environment.yml for a job
-    
-    Args:
-        env_name (str): Name of environment
-        env_file_name (str): File path of environment file
-        req_file_name (str): File path of requirements file
-    """
-    # Open and write to environment.yml equivalent file
-    with open(env_file_name, 'w') as f:
-        f.write(f"""\
-name: {env_name}
-channels:
-  - defaults
-
-dependencies:
-  - python
-  - pip
-
-  - pip:
-    - -r {req_file_name}
-""")
-
-
-def generate_requirements_txt(req_file_name: str) -> None:
-    """Generates a requirements.txt equivalent for a job by inspecting the source code
-
-    Args:
-        req_file_name (str): File path of requirements file
-    """
-    # Get requirements
-    requirements = subprocess.run(
-        ["pipreqs", "--force", "--print"],
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.DEVNULL,
-        encoding="ascii"
-    ).stdout
-    
-    # Open and write to requirements.txt equivalent file
-    with open(req_file_name, 'w') as f:
-        f.write(requirements)
-    
-
-
-def ensure_environment_specification_exists(settings: Optional[JobSettings]) -> tuple[Optional[JobSettings], bool]:
-    """Ensures that an environment.yml and/or requirements.txt equivalent exists for a job
-    by creating the necessary files or by verifying that the specified files exist
-
-    Args:
-        settings (Optional[JobSettings]): Settings for the job to be run
-
-    Returns:
-        tuple[Optional[JobSettings], bool]: Tuple containing the job settings if valid environment, 
-            and a boolean indicating whether files were generated.
-    """
-    # if no settings given, return None
-    if settings is None:
-        return (None, False)
-
-
-    # Get environment and requirements file names
-    env_file_name = settings.env_file if settings.env_file else sprinkle_env_file_name
-    req_file_name = settings.req_file if settings.req_file else sprinkle_req_file_name
-
-    
-    # Mark environment and/or requirements files were generated
-    env_file_generated = False
-    req_file_generated = False
-    # Mark whether settings do not specify missing file(s)
-    settings_valid = True
-
-
-    # Change working directory to project directory
-    working_directory_old = os.getcwd()
-    working_directory_new = settings.working_dir or working_directory_old
-    os.chdir(working_directory_new)
-
-    # If no environment file specified, generate environment file
-    if settings.env_file == "":
-        env_file_generated = True
-        generate_environment_yml(settings.env_name, env_file_name, req_file_name)
-        settings = replace(settings, **{nameof(JobSettings.env_file): env_file_name})
-    # Else, check if specified file exists
-    else:
-        settings_valid &= os.path.isfile(settings.env_file)
-
-
-    # if no requirements file specified, generate requirements file
-    if settings.req_file == "":
-        req_file_generated = True
-        generate_requirements_txt(req_file_name)
-        settings = replace(settings, **{nameof(JobSettings.req_file): req_file_name})
-    # else, check if specified file exists
-    else:
-        settings_valid &= os.path.isfile(settings.req_file)
-
-
-    # Change working directory back to current working directory
-    os.chdir(working_directory_old)
-    
-    
-    # Return settings if files exist, also return whether files were generated
-    return (settings if settings_valid else None, env_file_generated or req_file_generated)
-
-
-
 def generate_bsub_script(settings: JobSettings, args: list[str] = []) -> str: 
     """Generates a bsub script for a job
 
@@ -451,10 +356,16 @@ def generate_bsub_script(settings: JobSettings, args: list[str] = []) -> str:
     def conditional_string(condition, string, end="\n"):
         return string + end if condition else ""
 
+
+    name = settings.name or JobSettings.defaults.name()
+    env_name = settings.env_name or JobSettings.defaults.env_name()
+    working_dir = settings.working_dir or JobSettings.defaults.working_dir()
+
+
     return (f"""\
 #!/bin/bash
 ### Job name
-#BSUB -J {settings.name}
+#BSUB -J {name}
 
 
 ### Job queue
@@ -487,8 +398,8 @@ export OMP_NUM_THREADS=$LSB_DJOB_NUMPROC
 
 ### Output and error file. %J is the job-id -- 
 ### -o and -e mean append, -oo and -eo mean overwrite -- 
-#BSUB -oo {sprinkle_project_log_dir}/%J-{settings.name}.txt
-#BSUB -eo {sprinkle_project_error_dir}/%J-{settings.name}.txt
+#BSUB -oo {sprinkle_project_log_dir}/%J-{name}.txt
+#BSUB -eo {sprinkle_project_error_dir}/%J-{name}.txt
 """
 +
 conditional_string(settings.email, 
@@ -506,59 +417,32 @@ f"""
 
 # Get shell environment
 source ~/.bashrc
-"""
-+
-conditional_string(settings.working_dir,
-f"""
+
+
 # Change working directory
-cd {settings.working_dir}
+cd {working_dir}
 
-""")
-+
-f"""
-# Check if job environment exists
-conda env list | grep "^{settings.env_name}" >> /dev/null
-SPRINKLE_JOB_ENV_EXISTS=$?
 
-# If environment does not exist, create environment
-if [[ ${{SPRINKLE_JOB_ENV_EXISTS}} -ne 0 ]]; then
-    # Create environment
-    # WARN: Race condition. Two (or more) jobs may attempt to create the same new environment.
-    #  This causes jobs to fail, because the others fail the conda commmand,
-    #  and then they continue on before the environment has been set up.
-    conda env create -n {settings.env_name} -f {settings.env_file}
-# Else, environment exists, attempt installing packages in case there were changes
-# WARN: This does not prune pip packages
-else
-    # Attempt installing (new) packages 
-    conda env update -n {settings.env_name} -f {settings.env_file} --prune
-fi
+# Activate environment for script
+conda activate {env_name}
 
-# If failed environment setup, inform and exit
+# If unable to activate environment, inform and exit
 if [[ $? -ne 0 ]]; then
-    echo "Failed to set up environment ({settings.env_name}) for job ($LSB_JOBID)." >&2
-    echo 'This may be caused by multiple jobs trying to set up the same environment for the first time.' >&2
-    echo 'If the job environment has NEVER been created before, a possible fix is to start one job,' >&2
-    echo 'let it finish setting up the environment, and afterwards start all the other jobs,' >&2
-    echo 'that use the same environment, can be rapidly started.' >&2
-    echo 'BEFORE DOING THE ABOVE, PLEASE RUN: conda env remove -n {settings.env_name} -y' >&2
+    echo "Failed to activate environment ({env_name}) for job ($LSB_JOBID)." >&2
+    echo 'Please run sprinkle setup before submitting the job.' >&2
     exit 1
 fi
 
 
-# Activate environment for script
-conda activate {settings.env_name}
-
-
 # Run job script and save output to file
 # NOTE: %J is not available so using environment variable
-{settings.script} {" ".join(args)} > {sprinkle_project_output_dir}/$LSB_JOBID-{settings.name}.txt
+{settings.script} {" ".join(args)} > {sprinkle_project_output_dir}/$LSB_JOBID-{name}.txt
 
 """
 +
 conditional_string(settings.env_on_done_delete, 
 f"""
 ### Remove environment when done
-conda env remove -n {settings.env_name} -y
+conda env remove -n {env_name} -y
 """)
 )

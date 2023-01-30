@@ -1,6 +1,5 @@
 from varname import nameof
-from typing import Callable, Optional, Any, Union
-from os import getcwd
+from typing import Callable, Optional, Any, Union, Literal
 from dataclasses import replace
 import re
 
@@ -41,7 +40,7 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
     f"{nameof(JobSettings.req_file)}": 
         ("Requirements file", empty_coalesce("[Auto-generated ONCE]")),
     f"{nameof(JobSettings.working_dir)}": 
-        ("Working directory", empty_coalesce(getcwd())),
+        ("Working directory", empty_coalesce(JobSettings.defaults.working_dir())),
 
     f"{nameof(JobSettings.queue)}": 
         ("Cluster queue", as_is),
@@ -50,9 +49,9 @@ job_settings_formatter: dict[str, tuple[str, Callable[[str], str]]] = lambda: {
         ("Job max time (HH:mm)", as_is),
 
     f"{nameof(JobSettings.name)}": 
-        ("Job name", as_is),
+        ("Job name", empty_coalesce(JobSettings.defaults.name())),
     f"{nameof(JobSettings.env_name)}": 
-        ("Environment name", as_is),
+        ("Environment name", empty_coalesce(JobSettings.defaults.env_name())),
     f"{nameof(JobSettings.env_on_done_delete)}": 
         ("Auto-delete environment", as_is_boolean),
 
@@ -98,28 +97,13 @@ def prompt_new_natural(attr: str, value_current: int, value_default: int) -> int
     )}
 
 
-def prompt_new_directory(allow_empty: bool = False) -> Callable[[str, str, str], str]:
-    def prompt(attr: str, value_current: str, value_default: str) -> str:
-        name, formatter = job_settings_formatter[attr]
-
-        return {attr: prompt_path(
-            f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-            path_type="directory",
-            value_allow_empty=allow_empty,
-            value_suggestion=formatter(value_default) if allow_empty else None
-        )}
-
-
-    return prompt
-
-
-def prompt_new_file(allow_empty: bool = False) -> Callable[[str, str, str], str]:
+def prompt_new_path(path_type: Literal["file", "directory"], allow_empty: bool = False) -> Callable[[str, str, str], str]:
     def prompt(attr: str, value_current: str, value_default: str) -> str:
         name, formatter = job_settings_formatter[attr]
         
         path = prompt_path(
             f"{name}\nCurrent: {formatter(value_current)} (Default: {formatter(value_default)})\n\nChoose new value: ",
-            path_type="file",
+            path_type=path_type,
             value_allow_empty=allow_empty,
             value_suggestion=formatter(value_default) if allow_empty else None
         )
@@ -188,9 +172,9 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = l
     f"{nameof(JobSettings.cpu_cores)}": prompt_new_natural,
     f"{nameof(JobSettings.cpu_mem_gb)}": prompt_new_natural,
 
-    f"{nameof(JobSettings.env_file)}": prompt_new_file(allow_empty=True),
-    f"{nameof(JobSettings.req_file)}": prompt_new_file(allow_empty=True),
-    f"{nameof(JobSettings.working_dir)}": prompt_new_directory(allow_empty=True),
+    f"{nameof(JobSettings.env_file)}": prompt_new_path("file", allow_empty=True),
+    f"{nameof(JobSettings.req_file)}": prompt_new_path("file", allow_empty=True),
+    f"{nameof(JobSettings.working_dir)}": prompt_new_path("directory", allow_empty=True),
 
     f"{nameof(JobSettings.queue)}": prompt_new_queue,
     # Skipping: is_gpu_queue

@@ -160,6 +160,8 @@ In the below, "spr" may be used as a shorthand for "sprinkle".
 Usage:
   sprinkle start [--] [<args>...]
     Submit the job script and pass <args> to job script.
+    If settings have not been setup, prompt to set them up.
+    If environment has not been setup, sets it up.
     If <args> contains dashes, add the two dashes "--" before <args>.
 
   sprinkle stop [<job_id>... | -a | --all]
@@ -174,6 +176,10 @@ Usage:
 
   sprinkle settings
     Set up or change existing job settings.
+    
+  sprinkle setup [-d | --delete]
+    Set up job environment (or recreates it in case of changes).
+    If settings have not been setup, prompt to set them up.
 
   sprinkle export [<path>] [<args>...]
     Export submission script to <path> that passes <args> to the job script.
@@ -190,6 +196,7 @@ Usage:
 Options:
   -h -? --help       Show full help text.
   -a --all           For start, kill all jobs; For view, view full file.
+  -d --delete        Delete environment without recreating it.
 ```
 
 # 🧑‍⚖️ Disclaimer
