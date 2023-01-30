@@ -53,6 +53,7 @@ All commands below should be ❗ **run in your project directory** ❗.
     0. `sprinkle help` _(view other commands)_
 
 Sprinkle will attempt to automatically detect and setup your packages.
+The packages may take some time to install, so please be patient. It will only need to be done once.
 If this fails, check the FAQ below for how to create an environment file.
 
 # 📖 Frequently asked questions
