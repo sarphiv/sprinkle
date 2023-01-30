@@ -203,10 +203,10 @@ class Command:
             return 1
 
 
-        # If environment not yet set up, set it up
+        # If environment not yet set up, set it up, if failure, inform and return failure
         if not exists_environment(settings.env_name):
-            if recreate_environment(settings.env_name, settings.env_file, output=True) != 0:
-                print(f'ERROR: Failed to set up environment "{settings.env_name}"')
+            if not recreate_environment(settings.env_name, settings.env_file, output=True):
+                print(f'ERROR: Failed to set up environment "{settings.env_name or JobSettings.defaults.env_name()}"')
                 return 1
 
 
@@ -223,7 +223,7 @@ class Command:
 
 
         # Return successful
-        return True
+        return 0
 
 
 
@@ -452,10 +452,10 @@ class Command:
 
         # If delete only, delete environment
         if delete:
-            return 1 if delete_environment(settings.env_name, output=True) else 0
+            return 0 if delete_environment(settings.env_name, output=True) else 1
         # Else, recreate environment
         else:
-            return 1 if recreate_environment(settings.env_name, settings.env_file, output=True) else 0
+            return 0 if recreate_environment(settings.env_name, settings.env_file, output=True) else 1
 
 
 
