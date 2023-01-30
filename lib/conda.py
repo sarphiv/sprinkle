@@ -52,6 +52,10 @@ def exists_environment(env_name: str) -> bool:
     Returns:
         bool: True if environment exists, False otherwise
     """
+    # Use default environment name if not specified
+    env_name = env_name or JobSettings.defaults.env_name()
+
+
     return env_name in get_environments()[0]
 
 
@@ -67,6 +71,10 @@ def recreate_environment(env_name: str, env_file_name: str, output: bool = False
     Returns:
         bool: True if environment was successfully (re)created, False otherwise
     """
+    # Use default environment name if not specified
+    env_name = env_name or JobSettings.defaults.env_name()
+
+
     # Get list of environments and the activate environment
     environments, active = get_environments()
 
@@ -119,6 +127,9 @@ def delete_environment(env_name: str, output: bool = False) -> bool:
     Returns:
         bool: True if environment was successfully deleted, False otherwise
     """
+    # Use default environment name if not specified
+    env_name = env_name or JobSettings.defaults.env_name()
+
     # Get list of environments and the activate environment
     environments, active = get_environments()
 

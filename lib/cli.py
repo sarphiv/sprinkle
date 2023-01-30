@@ -205,7 +205,9 @@ class Command:
 
         # If environment not yet set up, set it up
         if not exists_environment(settings.env_name):
-            recreate_environment(settings.env_name, settings.env_file, output=True)
+            if recreate_environment(settings.env_name, settings.env_file, output=True) != 0:
+                print(f'ERROR: Failed to set up environment "{settings.env_name}"')
+                return 1
 
 
         # Check if environment and requirements files exists, inform and fail if not
