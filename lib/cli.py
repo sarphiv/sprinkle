@@ -219,7 +219,7 @@ class Command:
         job_id = submit_job(settings, args)
 
         # Print job ID
-        print(f'Started job (Name: "{settings.name}", ID: "{job_id}", Script: "{settings.script} {" ".join(args)}")')
+        print(f'Started job (Name: "{settings.name or JobSettings.defaults.name()}", ID: "{job_id}", Script: "{settings.script} {" ".join(args)}")')
 
 
         # Return successful
