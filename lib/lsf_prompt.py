@@ -180,8 +180,8 @@ job_settings_prompter: dict[str, Callable[[str, str, str], Union[str, int]]] = l
     # Skipping: is_gpu_queue
     f"{nameof(JobSettings.time_max)}": prompt_new_time,
 
-    f"{nameof(JobSettings.name)}": prompt_new_string(allow_empty=False),
-    f"{nameof(JobSettings.env_name)}": prompt_new_string(allow_empty=False),
+    f"{nameof(JobSettings.name)}": prompt_new_string(allow_empty=True),
+    f"{nameof(JobSettings.env_name)}": prompt_new_string(allow_empty=True),
     f"{nameof(JobSettings.env_on_done_delete)}": prompt_new_boolean,
 
     f"{nameof(JobSettings.email)}": prompt_new_string(allow_empty=True),
