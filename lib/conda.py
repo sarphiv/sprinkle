@@ -28,11 +28,11 @@ def get_environments() -> tuple[set[str], Optional[str]]:
     environment_active = None
 
     for line in output:
-        if line.startswith("#"):
+        if not line or line.startswith("#"):
             continue
         
         components = line.split()
-            
+
         environments.append(components[0])
         if components[1] == '*':
             environment_active = components[0]
